@@ -348,14 +348,13 @@ class AppController {
       });
     }
 
-    // Step Trainer Buttons
+    // Step Trainer Buttons (Guaranteed State Synchronization)
     const setupBtn = document.getElementById('btn-tutorial-setup');
     if (setupBtn) {
       setupBtn.addEventListener('click', () => {
         const lesson = LBL_COURSE[this.currentTutorialStep];
-        if (lesson && lesson.setup) {
-          this.cube3d.executeMoves(lesson.setup);
-          this.initStepTrainer(lesson.formula);
+        if (lesson) {
+          this.setupCase(lesson);
         }
       });
     }
@@ -364,8 +363,18 @@ class AppController {
     if (playAllBtn) {
       playAllBtn.addEventListener('click', () => {
         const lesson = LBL_COURSE[this.currentTutorialStep];
-        if (lesson && lesson.formula) {
-          this.cube3d.executeMoves(lesson.formula);
+        if (lesson) {
+          if (this.stepCurrentIndex >= this.stepMovesList.length) {
+            this.setupCase(lesson);
+          }
+          const remainingMoves = this.stepMovesList.slice(this.stepCurrentIndex);
+          if (remainingMoves.length > 0) {
+            this.cube3d.executeMoves(remainingMoves.join(' '));
+            this.stepCurrentIndex = this.stepMovesList.length;
+            this.updateStepPrompt();
+            this.highlightTableRow(this.stepCurrentIndex);
+            this.updateProgressBadge();
+          }
         }
       });
     }
@@ -385,9 +394,7 @@ class AppController {
       restartStepBtn.addEventListener('click', () => {
         const lesson = LBL_COURSE[this.currentTutorialStep];
         if (lesson) {
-          this.cube3d.resetCube();
-          if (lesson.setup) this.cube3d.executeMoves(lesson.setup);
-          this.initStepTrainer(lesson.formula);
+          this.setupCase(lesson);
         }
       });
     }
@@ -425,22 +432,51 @@ class AppController {
     }
   }
 
-  // Step-by-Step Formula Trainer Logic
+  // Unified Step-by-Step Formula Trainer Logic (Conflict-Free State Machine)
   initStepTrainer(formulaStr) {
     this.stepMovesList = formulaStr.trim().split(/\s+/).filter(m => m.length > 0);
     this.stepCurrentIndex = 0;
-    this.renderStepChips();
     this.updateStepPrompt();
+    this.updateProgressBadge();
+  }
+
+  setupCase(lesson) {
+    this.cube3d.stopQueue();
+    this.cube3d.resetCube();
+    if (lesson.setup) {
+      this.cube3d.executeMoves(lesson.setup, false); // Instant case setup
+    }
+    this.stepCurrentIndex = 0;
+    this.updateStepPrompt();
+    this.highlightTableRow(0);
+    this.updateProgressBadge();
+  }
+
+  jumpToStep(targetIndex) {
+    const lesson = LBL_COURSE[this.currentTutorialStep];
+    if (!lesson) return;
+    this.cube3d.stopQueue();
+    this.cube3d.resetCube();
+    if (lesson.setup) {
+      this.cube3d.executeMoves(lesson.setup, false);
+    }
+    for (let i = 0; i < targetIndex; i++) {
+      this.cube3d.executeMove(this.stepMovesList[i], false);
+    }
+    this.stepCurrentIndex = targetIndex;
+    this.updateStepPrompt();
+    this.highlightTableRow(targetIndex);
+    this.updateProgressBadge();
   }
 
   stepForward() {
     if (this.stepCurrentIndex >= this.stepMovesList.length) return;
     const move = this.stepMovesList[this.stepCurrentIndex];
-    this.cube3d.executeMove(move);
+    this.cube3d.executeMove(move, true);
     this.stepCurrentIndex++;
-    this.renderStepChips();
     this.updateStepPrompt();
-    this.highlightTableRow(this.stepCurrentIndex < this.stepMovesList.length ? this.stepCurrentIndex : -1);
+    this.highlightTableRow(this.stepCurrentIndex);
+    this.updateProgressBadge();
   }
 
   stepBackward() {
@@ -448,29 +484,17 @@ class AppController {
     this.stepCurrentIndex--;
     const move = this.stepMovesList[this.stepCurrentIndex];
     const inverted = this.logic.invertMove(move);
-    this.cube3d.executeMove(inverted);
-    this.renderStepChips();
+    this.cube3d.executeMove(inverted, true);
     this.updateStepPrompt();
     this.highlightTableRow(this.stepCurrentIndex);
+    this.updateProgressBadge();
   }
 
-  renderStepChips() {
-    const container = document.getElementById('step-chips-container');
-    if (!container) return;
-    container.innerHTML = '';
-
-    this.stepMovesList.forEach((m, idx) => {
-      const chip = document.createElement('span');
-      chip.className = `px-2 py-1 rounded font-mono text-xs font-bold transition-all ${
-        idx === this.stepCurrentIndex
-          ? 'bg-sky-500 text-slate-900 shadow-md scale-110 ring-2 ring-sky-300'
-          : idx < this.stepCurrentIndex
-          ? 'bg-slate-700/60 text-slate-400 line-through'
-          : 'bg-slate-800 text-slate-200'
-      }`;
-      chip.textContent = m;
-      container.appendChild(chip);
-    });
+  updateProgressBadge() {
+    const badge = document.getElementById('step-progress-badge');
+    if (badge) {
+      badge.textContent = `${this.stepCurrentIndex} / ${this.stepMovesList.length}`;
+    }
   }
 
   updateStepPrompt() {
@@ -478,21 +502,29 @@ class AppController {
     if (!promptEl) return;
 
     if (this.stepMovesList.length === 0) {
-      promptEl.textContent = "點擊「套用情況」或「單步下一步」開始演練！";
+      promptEl.innerHTML = `<span>點擊下方「下一步 ▶」開始依序演練！</span>`;
       return;
     }
 
     if (this.stepCurrentIndex >= this.stepMovesList.length) {
-      promptEl.textContent = "🎉 本公式所有單步動作已演練完畢！";
+      promptEl.innerHTML = `<span class="text-emerald-400 font-bold flex items-center gap-1.5">🎉 本步驟所有動作已演練完成！方塊已順利達成目標！</span>`;
       return;
     }
 
     const currentMove = this.stepMovesList[this.stepCurrentIndex];
     const lesson = LBL_COURSE[this.currentTutorialStep];
     const guideItem = lesson.movesGuide ? lesson.movesGuide.find(g => g.move === currentMove) : null;
+    const action = guideItem ? guideItem.actionZh : '';
     const desc = guideItem ? guideItem.textZh : `動作：${currentMove}`;
 
-    promptEl.innerHTML = `<span class="text-sky-400 font-bold">第 ${this.stepCurrentIndex + 1}/${this.stepMovesList.length} 步：${currentMove}</span> ➔ ${desc}`;
+    promptEl.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span class="bg-sky-500 text-slate-900 font-black px-2 py-0.5 rounded text-xs">第 ${this.stepCurrentIndex + 1} 步</span>
+        <span class="font-mono font-bold text-sky-400 text-sm">${currentMove}</span>
+        <span class="font-bold text-amber-300 text-xs">${action}</span>
+        <span class="text-slate-300 text-xs">➔ ${desc}</span>
+      </div>
+    `;
   }
 
   renderTutorialCard() {
@@ -519,42 +551,41 @@ class AppController {
     const formulaEl = document.getElementById('tutorial-card-formula');
     if (formulaEl) formulaEl.textContent = lesson.formula;
 
-    // Render 1-to-1 Action Correspondence Table
+    // Render Unified Table Rows
     const tbody = document.getElementById('tutorial-moves-table-body');
     if (tbody && lesson.movesGuide) {
       tbody.innerHTML = '';
       lesson.movesGuide.forEach((g, idx) => {
         const tr = document.createElement('tr');
-        tr.className = 'transition-colors cursor-pointer hover:bg-sky-500/10';
         tr.id = `step-table-row-${idx}`;
+        tr.className = 'transition-colors cursor-pointer hover:bg-sky-500/10';
+        tr.title = `點擊跳轉至第 ${idx + 1} 步`;
+
         tr.innerHTML = `
+          <td class="py-2.5 px-2.5 text-center font-mono font-bold text-slate-400 text-xs">${idx + 1}</td>
           <td class="py-2.5 px-2.5 text-center font-mono font-black text-sky-400 text-sm">${g.move}</td>
           <td class="py-2.5 px-2.5 text-center font-bold text-amber-300">${g.actionZh || ''}</td>
           <td class="py-2.5 px-3 text-slate-200">${g.textZh}</td>
           <td class="py-2.5 px-3 text-slate-400 hidden sm:table-cell">${g.whyZh || ''}</td>
-          <td class="py-2.5 px-2 text-center">
-            <button class="px-2 py-1 rounded bg-slate-800 hover:bg-sky-500 hover:text-slate-900 text-[10px] font-bold text-slate-200 border border-white/10 transition-all">
-              轉動
-            </button>
+          <td class="py-2.5 px-2 text-center text-xs" id="step-status-cell-${idx}">
+            <span class="text-slate-500">○ 待執行</span>
           </td>
         `;
+
         tr.addEventListener('click', () => {
-          this.cube3d.executeMove(g.move);
-          this.stepCurrentIndex = idx;
-          this.renderStepChips();
-          this.updateStepPrompt();
-          this.highlightTableRow(idx);
+          this.jumpToStep(idx);
         });
+
         tbody.appendChild(tr);
       });
-      this.highlightTableRow(this.stepCurrentIndex);
     }
 
     const tipEl = document.getElementById('tutorial-card-tip');
     if (tipEl) tipEl.textContent = lesson.tipZh;
 
-    // Initialize step trainer chips
+    // Automatically setup the case for this lesson cleanly
     this.initStepTrainer(lesson.formula);
+    this.setupCase(lesson);
 
     const prevBtn = document.getElementById('btn-tutorial-prev');
     if (prevBtn) prevBtn.disabled = this.currentTutorialStep === 0;
@@ -565,10 +596,16 @@ class AppController {
 
   highlightTableRow(index) {
     document.querySelectorAll('#tutorial-moves-table-body tr').forEach((r, i) => {
-      if (i === index) {
-        r.className = 'bg-sky-500/25 font-bold transition-colors cursor-pointer border-l-4 border-l-sky-400 shadow-sm';
+      const statusCell = document.getElementById(`step-status-cell-${i}`);
+      if (i < index) {
+        r.className = 'transition-colors cursor-pointer bg-slate-900/40 text-slate-400';
+        if (statusCell) statusCell.innerHTML = `<span class="text-emerald-400 font-bold">✓ 已完成</span>`;
+      } else if (i === index) {
+        r.className = 'bg-sky-500/20 font-bold transition-colors cursor-pointer border-l-4 border-l-sky-400 shadow-sm';
+        if (statusCell) statusCell.innerHTML = `<span class="text-sky-400 font-black">👉 當前</span>`;
       } else {
-        r.className = 'transition-colors cursor-pointer hover:bg-sky-500/10';
+        r.className = 'transition-colors cursor-pointer hover:bg-sky-500/10 text-slate-300';
+        if (statusCell) statusCell.innerHTML = `<span class="text-slate-500">○ 待執行</span>`;
       }
     });
   }

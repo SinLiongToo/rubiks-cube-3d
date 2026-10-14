@@ -225,27 +225,38 @@
             先將 4 個白色邊塊湊到頂部黃色中心四周形成小花...
           </p>
 
-          <!-- Core Formula & Mnemonic Box -->
-          <div class="bg-slate-900/90 p-3.5 rounded-xl border border-white/10 flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold text-slate-300" data-i18n="formulaLabel">核心公式：</span>
-              <span class="text-sm text-emerald-400 font-mono font-black tracking-wider bg-slate-950 px-2.5 py-1 rounded-lg border border-white/10" id="tutorial-card-formula">F2 R2 B2 L2</span>
+          <!-- Unified Curriculum & Interactive Step Trainer -->
+          <div class="bg-slate-900/90 p-4 rounded-xl border border-white/10 flex flex-col gap-3">
+            
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-300" data-i18n="formulaLabel">核心公式：</span>
+                <span class="text-sm text-emerald-400 font-mono font-black tracking-wider bg-slate-950 px-2.5 py-1 rounded-lg border border-white/10" id="tutorial-card-formula">F2 R2 B2 L2</span>
+              </div>
+              <button id="btn-tutorial-setup" class="py-1 px-3 rounded-lg bg-sky-500/20 hover:bg-sky-500 hover:text-slate-900 text-xs font-bold border border-sky-500/40 text-sky-300 transition-all flex items-center gap-1" data-i18n="btnSetupCase">
+                🎯 示範此步驟局面 (Setup)
+              </button>
             </div>
 
-            <!-- 1-to-1 Action Correspondence Table -->
+            <!-- Unified Progress Table (The Table IS the Step Progress) -->
             <div class="flex flex-col gap-1.5 pt-1 border-t border-white/10">
-              <span class="text-xs text-sky-400 font-bold flex items-center gap-1">
-                📋 英文代號與動作一對一對應表 (點選任何一列可立即 3D 示範)：
-              </span>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-sky-400 font-bold flex items-center gap-1">
+                  📋 步驟進度與動作對照表 (點選任一步可直接跳轉)：
+                </span>
+                <span id="step-progress-badge" class="font-mono text-[11px] font-bold text-sky-400 bg-slate-950 px-2 py-0.5 rounded-full border border-sky-500/20">0 / 4</span>
+              </div>
+
               <div class="overflow-x-auto rounded-xl border border-white/10 bg-slate-950/70 shadow-inner">
                 <table class="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr class="border-b border-white/10 bg-slate-900 text-slate-300">
+                      <th class="py-2 px-2.5 font-bold text-center w-12">步驟</th>
                       <th class="py-2 px-2.5 font-bold text-center w-14">代號</th>
-                      <th class="py-2 px-2.5 font-bold text-center w-24">中文口訣</th>
+                      <th class="py-2 px-2.5 font-bold text-center w-20">口訣</th>
                       <th class="py-2 px-3 font-bold">具體手指動作</th>
-                      <th class="py-2 px-3 font-bold hidden sm:table-cell">英文代號原意</th>
-                      <th class="py-2 px-2 font-bold text-center w-16">示範</th>
+                      <th class="py-2 px-3 font-bold hidden sm:table-cell">英文原意</th>
+                      <th class="py-2 px-2 font-bold text-center w-16">進度狀態</th>
                     </tr>
                   </thead>
                   <tbody id="tutorial-moves-table-body" class="divide-y divide-white/5">
@@ -255,49 +266,33 @@
               </div>
             </div>
 
+            <!-- Current Step Live Explanatory Prompt -->
+            <div id="step-current-prompt" class="text-xs text-slate-200 bg-slate-950 p-2.5 rounded-xl border border-sky-500/30 min-h-[38px] flex items-center">
+              點擊下方「下一步 ▶」開始依序演練！
+            </div>
+
+            <!-- Unified Step Trainer Navigation Controls -->
+            <div class="grid grid-cols-4 gap-1.5 pt-1">
+              <button id="btn-step-prev" class="py-2 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-white/10 transition-all text-center" data-i18n="btnStepPrev">
+                ◀ 上一步
+              </button>
+              <button id="btn-step-next" class="py-2 px-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-900 text-xs font-bold shadow-md shadow-sky-500/20 transition-all text-center" data-i18n="btnStepNext">
+                下一步 ▶
+              </button>
+              <button id="btn-tutorial-play" class="py-2 px-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition-all text-center" data-i18n="btnPlayFormula">
+                ▶ 自動播放
+              </button>
+              <button id="btn-step-restart" class="py-2 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-white/10 transition-all text-center" data-i18n="btnRestartStep">
+                ↺ 重頭開始
+              </button>
+            </div>
+
+            <!-- Mnemonic -->
             <div class="text-xs text-slate-300 leading-snug pt-1 border-t border-white/10">
               <span class="text-amber-400 font-bold" data-i18n="mnemonicLabel">口訣：</span>
               <span id="tutorial-card-tip" class="font-medium">黃心白花 ➔ 對齊側面顏色 ➔ 轉兩次 180° 送到底部。</span>
             </div>
           </div>
-
-          <!-- Interactive Step-by-Step Trainer -->
-          <div class="bg-slate-950/60 p-3 rounded-xl border border-sky-500/30 flex flex-col gap-2">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-bold text-sky-400">👣 單步演練器 (點擊單步學習)：</span>
-              <button id="btn-step-restart" class="text-[11px] text-slate-400 hover:text-slate-200 underline" data-i18n="btnRestartStep">
-                ↺ 重新演練
-              </button>
-            </div>
-
-            <!-- Chips sequence -->
-            <div id="step-chips-container" class="flex flex-wrap items-center gap-1.5 min-h-[30px] p-1 bg-slate-900/60 rounded-lg">
-              <!-- Dynamically rendered -->
-            </div>
-
-            <!-- Current Move Explanatory Prompt -->
-            <div id="step-current-prompt" class="text-xs text-slate-200 bg-slate-900/80 p-2 rounded-lg border border-white/5 min-h-[32px] flex items-center">
-              點擊「示範此步驟局面」或「單步下一步」開始演練！
-            </div>
-
-            <!-- Step Trainer Buttons Grid -->
-            <div class="grid grid-cols-3 gap-1.5 pt-1">
-              <button id="btn-step-prev" class="py-2 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-white/10 transition-all text-center" data-i18n="btnStepPrev">
-                ◀ 單步退回
-              </button>
-              <button id="btn-step-next" class="py-2 px-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-900 text-xs font-bold shadow-md shadow-sky-500/20 transition-all text-center" data-i18n="btnStepNext">
-                單步下一步 ▶
-              </button>
-              <button id="btn-tutorial-play" class="py-2 px-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition-all text-center" data-i18n="btnPlayFormula">
-                ▶ 自動連續播放
-              </button>
-            </div>
-          </div>
-
-          <!-- Step Setup Case Button -->
-          <button id="btn-tutorial-setup" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold border border-white/10 text-slate-200 transition-all flex items-center justify-center gap-1.5" data-i18n="btnSetupCase">
-            🎯 示範此步驟局面 (Setup)
-          </button>
 
           <!-- Prev / Next Lesson Navigation -->
           <div class="flex items-center justify-between pt-2 border-t border-white/10">
