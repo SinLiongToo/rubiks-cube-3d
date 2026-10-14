@@ -106,7 +106,7 @@ const CUBE_ANATOMY = [
   }
 ];
 
-// 7-Step LBL Curriculum with 1-to-1 Explicit Action Mapping
+// 7-Step LBL Curriculum with Exhaustive 1-to-1 Action Correspondence
 const LBL_COURSE = [
   {
     id: 'step1',
@@ -119,10 +119,10 @@ const LBL_COURSE = [
     formula: "F2 R2 B2 L2",
     setup: "F2 R2 B2 L2",
     movesGuide: [
-      { move: "F2", actionZh: "【前轉兩次】", textZh: "前層轉 180°，將前方對齊的白色邊塊翻到底部" },
-      { move: "R2", actionZh: "【右轉兩次】", textZh: "右層轉 180°，將右方對齊的白色邊塊翻到底部" },
-      { move: "B2", actionZh: "【後轉兩次】", textZh: "後層轉 180°，將後方對齊的白色邊塊翻到底部" },
-      { move: "L2", actionZh: "【左轉兩次】", textZh: "左層轉 180°，將左方對齊的白色邊塊翻到底部" }
+      { move: "F2", actionZh: "【前轉兩次】", textZh: "前層轉 180°，將前方對齊的白色邊塊翻到底部", whyZh: "F2 = Front 180° (前層兩次)" },
+      { move: "R2", actionZh: "【右轉兩次】", textZh: "右層轉 180°，將右方對齊的白色邊塊翻到底部", whyZh: "R2 = Right 180° (右層兩次)" },
+      { move: "B2", actionZh: "【後轉兩次】", textZh: "後層轉 180°，將後方對齊的白色邊塊翻到底部", whyZh: "B2 = Back 180° (後層兩次)" },
+      { move: "L2", actionZh: "【左轉兩次】", textZh: "左層轉 180°，將左方對齊的白色邊塊翻到底部", whyZh: "L2 = Left 180° (左層兩次)" }
     ],
     tipZh: '黃心湊白花 ➔ 對齊側面顏色 ➔ 轉兩次 180° 翻到底面。'
   },
@@ -137,10 +137,10 @@ const LBL_COURSE = [
     formula: "R U R' U'",
     setup: "U R U' R'",
     movesGuide: [
-      { move: "R", actionZh: "【上】", textZh: "右手向上推右層 90°" },
-      { move: "U", actionZh: "【左】", textZh: "右手食指撥頂層向左 90°" },
-      { move: "R'", actionZh: "【下】", textZh: "右手向下拉回右層 90°" },
-      { move: "U'", actionZh: "【右】", textZh: "左手食指撥頂層向右 90°" }
+      { move: "R", actionZh: "【上】", textZh: "右手向上推右層 90°", whyZh: "R = Right (右層順時針)" },
+      { move: "U", actionZh: "【左】", textZh: "右手食指撥頂層向左 90°", whyZh: "U = Up (頂層順時針)" },
+      { move: "R'", actionZh: "【下】", textZh: "右手向下拉回右層 90°", whyZh: "R' = Right Counter-Clockwise (右層逆時針回位)" },
+      { move: "U'", actionZh: "【右】", textZh: "左手食指撥頂層向右 90°", whyZh: "U' = Up Counter-Clockwise (頂層逆時針回位)" }
     ],
     tipZh: '目標放右上角 ➔ 做右手公式【上、左、下、右】➔ 白面朝下即歸位！'
   },
@@ -155,14 +155,14 @@ const LBL_COURSE = [
     formula: "U R U' R' U' F' U F",
     setup: "F' U' F U R U R' U'",
     movesGuide: [
-      { move: "U", actionZh: "【遠離】", textZh: "頂層向左撥（遠離目標）" },
-      { move: "R", actionZh: "【上】", textZh: "右層向上推" },
-      { move: "U'", actionZh: "【回】", textZh: "頂層向右撥回" },
-      { move: "R'", actionZh: "【下】", textZh: "右層向下拉回復位" },
-      { move: "U'", actionZh: "【換手】", textZh: "頂層向右撥（準備左手換位）" },
-      { move: "F'", actionZh: "【開面】", textZh: "前層逆時針推開" },
-      { move: "U", actionZh: "【裝入】", textZh: "頂層向左送入" },
-      { move: "F", actionZh: "【還原】", textZh: "前層順時針復原" }
+      { move: "U", actionZh: "【遠離】", textZh: "頂層向左撥 90°（遠離右側目標槽位）", whyZh: "U = Up 順時針" },
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U'", actionZh: "【回】", textZh: "頂層向右撥回 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉回復位 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U'", actionZh: "【換手】", textZh: "頂層向右撥 90°（準備換手裝入）", whyZh: "U' = Up 逆時針" },
+      { move: "F'", actionZh: "【開面】", textZh: "前層逆時針推開 90°", whyZh: "F' = Front 逆時針" },
+      { move: "U", actionZh: "【裝入】", textZh: "頂層向左撥 90° 送入槽位", whyZh: "U = Up 順時針" },
+      { move: "F", actionZh: "【還原】", textZh: "前層順時針轉回復原 90°", whyZh: "F = Front 順時針" }
     ],
     tipZh: '遠離目標 ➔ 做同側公式 ➔ 轉身抓角 ➔ 做另一手公式送入！'
   },
@@ -177,12 +177,12 @@ const LBL_COURSE = [
     formula: "F R U R' U' F'",
     setup: "F U R U' R' F'",
     movesGuide: [
-      { move: "F", actionZh: "【轉開正面】", textZh: "前面順時針轉 90°" },
-      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°" },
-      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°" },
-      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°" },
-      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°" },
-      { move: "F'", actionZh: "【轉回正面】", textZh: "前面逆時針轉回 90°" }
+      { move: "F", actionZh: "【轉開正面】", textZh: "前面順時針轉 90°（轉開正臉）", whyZh: "F = Front 順時針" },
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉回 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥回 90°", whyZh: "U' = Up 逆時針" },
+      { move: "F'", actionZh: "【轉回正面】", textZh: "前面逆時針轉回 90°（轉回正臉）", whyZh: "F' = Front 逆時針" }
     ],
     tipZh: '轉開正面 F ➔ 右手四步【上左下右】➔ 轉回正面 F\'。'
   },
@@ -197,13 +197,13 @@ const LBL_COURSE = [
     formula: "R U R' U R U2 R'",
     setup: "R U2 R' U' R U' R'",
     movesGuide: [
-      { move: "R", actionZh: "【上】", textZh: "右層向上推" },
-      { move: "U", actionZh: "【左】", textZh: "頂層向左撥" },
-      { move: "R'", actionZh: "【下】", textZh: "右層向下拉" },
-      { move: "U", actionZh: "【左】", textZh: "頂層向左撥" },
-      { move: "R", actionZh: "【上】", textZh: "右層向上推" },
-      { move: "U2", actionZh: "【左左】", textZh: "頂層連續向左撥兩次 (180°)" },
-      { move: "R'", actionZh: "【下】", textZh: "右層向下拉回復位" }
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉回 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U2", actionZh: "【左左】", textZh: "頂層連續向左撥兩次 (180°)", whyZh: "U2 = Up 180°" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉回復位 90°", whyZh: "R' = Right 逆時針" }
     ],
     tipZh: '魚頭朝左下 ➔ 上、左、下、左、上、左左、下！'
   },
@@ -218,20 +218,20 @@ const LBL_COURSE = [
     formula: "R U R' U' R' F R2 U' R' U' R U R' F'",
     setup: "F R U' R' U R U R2 F' R U R U' R'",
     movesGuide: [
-      { move: "R", actionZh: "【上】", textZh: "右層向上推" },
-      { move: "U", actionZh: "【左】", textZh: "頂層向左撥" },
-      { move: "R'", actionZh: "【下】", textZh: "右層向下拉" },
-      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥" },
-      { move: "R'", actionZh: "【下】", textZh: "右層向下拉" },
-      { move: "F", actionZh: "【轉開】", textZh: "前層順時針開面" },
-      { move: "R2", actionZh: "【雙推】", textZh: "右層轉 180°" },
-      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥" },
-      { move: "R'", actionZh: "【下】", textZh: "右層向下拉" },
-      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥" },
-      { move: "R", actionZh: "【上】", textZh: "右層向上推" },
-      { move: "U", actionZh: "【左】", textZh: "頂層向左撥" },
-      { move: "R'", actionZh: "【下】", textZh: "右層向下拉" },
-      { move: "F'", actionZh: "【轉回】", textZh: "前層逆時針還原" }
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°", whyZh: "R' = Right 逆時針" },
+      { move: "F", actionZh: "【轉開】", textZh: "前層順時針開面 90°", whyZh: "F = Front 順時針" },
+      { move: "R2", actionZh: "【雙推】", textZh: "右層轉 180°", whyZh: "R2 = Right 180°" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°", whyZh: "R' = Right 逆時針" },
+      { move: "F'", actionZh: "【轉回】", textZh: "前層逆時針還原 90°", whyZh: "F' = Front 逆時針" }
     ],
     tipZh: '車燈放左邊 ➔ 做 T-Perm 換角公式 ➔ 4 個角塊全部對齊！'
   },
@@ -246,17 +246,17 @@ const LBL_COURSE = [
     formula: "R U' R U R U R U' R' U' R2",
     setup: "R2 U R U R' U' R' U' R' U R'",
     movesGuide: [
-      { move: "R", actionZh: "【上】", textZh: "右層向上推" },
-      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥" },
-      { move: "R", actionZh: "【上】", textZh: "右層向上推" },
-      { move: "U", actionZh: "【左】", textZh: "頂層向左撥" },
-      { move: "R", actionZh: "【上】", textZh: "右層向上推" },
-      { move: "U", actionZh: "【左】", textZh: "頂層向左撥" },
-      { move: "R", actionZh: "【上】", textZh: "右層向上推" },
-      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥" },
-      { move: "R'", actionZh: "【下】", textZh: "右層向下拉" },
-      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥" },
-      { move: "R2", actionZh: "【雙還原】", textZh: "右層轉 180° 還原！" }
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R2", actionZh: "【雙還原】", textZh: "右層轉 180° 還原！", whyZh: "R2 = Right 180°" }
     ],
     tipZh: '完成面放後方 ➔ 做 U-Perm 三輪換 ➔ 大功告成！'
   }

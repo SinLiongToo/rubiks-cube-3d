@@ -232,13 +232,26 @@
               <span class="text-sm text-emerald-400 font-mono font-black tracking-wider bg-slate-950 px-2.5 py-1 rounded-lg border border-white/10" id="tutorial-card-formula">F2 R2 B2 L2</span>
             </div>
 
-            <!-- 1-to-1 Action Correspondence Grid -->
-            <div class="flex flex-col gap-1 pt-1 border-t border-white/10">
-              <span class="text-[11px] text-sky-400 font-bold flex items-center gap-1">
-                🔗 代號與中文動作一對一對應：
+            <!-- 1-to-1 Action Correspondence Table -->
+            <div class="flex flex-col gap-1.5 pt-1 border-t border-white/10">
+              <span class="text-xs text-sky-400 font-bold flex items-center gap-1">
+                📋 英文代號與動作一對一對應表 (點選任何一列可立即 3D 示範)：
               </span>
-              <div id="tutorial-moves-mapping-table" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-                <!-- Dynamically rendered 1-to-1 cards -->
+              <div class="overflow-x-auto rounded-xl border border-white/10 bg-slate-950/70 shadow-inner">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="border-b border-white/10 bg-slate-900 text-slate-300">
+                      <th class="py-2 px-2.5 font-bold text-center w-14">代號</th>
+                      <th class="py-2 px-2.5 font-bold text-center w-24">中文口訣</th>
+                      <th class="py-2 px-3 font-bold">具體手指動作</th>
+                      <th class="py-2 px-3 font-bold hidden sm:table-cell">英文代號原意</th>
+                      <th class="py-2 px-2 font-bold text-center w-16">示範</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tutorial-moves-table-body" class="divide-y divide-white/5">
+                    <!-- Dynamically rendered table rows -->
+                  </tbody>
+                </table>
               </div>
             </div>
 

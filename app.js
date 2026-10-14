@@ -440,6 +440,7 @@ class AppController {
     this.stepCurrentIndex++;
     this.renderStepChips();
     this.updateStepPrompt();
+    this.highlightTableRow(this.stepCurrentIndex < this.stepMovesList.length ? this.stepCurrentIndex : -1);
   }
 
   stepBackward() {
@@ -450,6 +451,7 @@ class AppController {
     this.cube3d.executeMove(inverted);
     this.renderStepChips();
     this.updateStepPrompt();
+    this.highlightTableRow(this.stepCurrentIndex);
   }
 
   renderStepChips() {
@@ -517,22 +519,35 @@ class AppController {
     const formulaEl = document.getElementById('tutorial-card-formula');
     if (formulaEl) formulaEl.textContent = lesson.formula;
 
-    // Render 1-to-1 Action Correspondence Grid
-    const mappingContainer = document.getElementById('tutorial-moves-mapping-table');
-    if (mappingContainer) {
-      mappingContainer.innerHTML = '';
-      if (lesson.movesGuide && lesson.movesGuide.length > 0) {
-        lesson.movesGuide.forEach(g => {
-          const card = document.createElement('div');
-          card.className = 'flex flex-col items-center justify-center bg-slate-950/70 p-2 rounded-xl border border-sky-500/25 text-center shadow-sm';
-          card.innerHTML = `
-            <div class="font-mono font-black text-sky-400 text-sm tracking-wide">${g.move}</div>
-            <div class="font-bold text-amber-300 text-xs my-0.5">${g.actionZh || ''}</div>
-            <div class="text-[10px] text-slate-300 leading-tight">${g.textZh}</div>
-          `;
-          mappingContainer.appendChild(card);
+    // Render 1-to-1 Action Correspondence Table
+    const tbody = document.getElementById('tutorial-moves-table-body');
+    if (tbody && lesson.movesGuide) {
+      tbody.innerHTML = '';
+      lesson.movesGuide.forEach((g, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'transition-colors cursor-pointer hover:bg-sky-500/10';
+        tr.id = `step-table-row-${idx}`;
+        tr.innerHTML = `
+          <td class="py-2.5 px-2.5 text-center font-mono font-black text-sky-400 text-sm">${g.move}</td>
+          <td class="py-2.5 px-2.5 text-center font-bold text-amber-300">${g.actionZh || ''}</td>
+          <td class="py-2.5 px-3 text-slate-200">${g.textZh}</td>
+          <td class="py-2.5 px-3 text-slate-400 hidden sm:table-cell">${g.whyZh || ''}</td>
+          <td class="py-2.5 px-2 text-center">
+            <button class="px-2 py-1 rounded bg-slate-800 hover:bg-sky-500 hover:text-slate-900 text-[10px] font-bold text-slate-200 border border-white/10 transition-all">
+              轉動
+            </button>
+          </td>
+        `;
+        tr.addEventListener('click', () => {
+          this.cube3d.executeMove(g.move);
+          this.stepCurrentIndex = idx;
+          this.renderStepChips();
+          this.updateStepPrompt();
+          this.highlightTableRow(idx);
         });
-      }
+        tbody.appendChild(tr);
+      });
+      this.highlightTableRow(this.stepCurrentIndex);
     }
 
     const tipEl = document.getElementById('tutorial-card-tip');
@@ -546,6 +561,16 @@ class AppController {
 
     const nextBtn = document.getElementById('btn-tutorial-next');
     if (nextBtn) nextBtn.disabled = this.currentTutorialStep === LBL_COURSE.length - 1;
+  }
+
+  highlightTableRow(index) {
+    document.querySelectorAll('#tutorial-moves-table-body tr').forEach((r, i) => {
+      if (i === index) {
+        r.className = 'bg-sky-500/25 font-bold transition-colors cursor-pointer border-l-4 border-l-sky-400 shadow-sm';
+      } else {
+        r.className = 'transition-colors cursor-pointer hover:bg-sky-500/10';
+      }
+    });
   }
 
   // Speedcubing Timer Logic
