@@ -70,6 +70,7 @@ class RubiksCube3D {
     this.initAudio();
     this.createCube();
     this.setupInteractions();
+    this.initBackView();
     this.animate();
   }
 
@@ -118,6 +119,38 @@ class RubiksCube3D {
     window.addEventListener('resize', () => this.onWindowResize());
   }
 
+  initBackView() {
+    this.backContainer = document.getElementById('canvas-back-container');
+    if (!this.backContainer) return;
+
+    const width = this.backContainer.clientWidth || 128;
+    const height = this.backContainer.clientHeight || 128;
+
+    this.backCamera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    // Oppsite to standard front view (4.8, 4.2, 5.6) -> (-4.8, -4.2, -5.6)
+    // Allows viewing Back (Blue), Down (White), and Left (Orange)
+    this.backCamera.position.set(-4.8, -4.2, -5.6);
+    this.backCamera.lookAt(0, 0, 0);
+
+    this.backRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.backRenderer.setSize(width, height);
+    this.backRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.backRenderer.shadowMap.enabled = true;
+    this.backContainer.appendChild(this.backRenderer.domElement);
+
+    this.backContainer.addEventListener('click', () => {
+      this.flipCamera();
+    });
+  }
+
+  flipCamera() {
+    if (!this.camera || !this.controls) return;
+    this.camera.position.negate();
+    this.camera.lookAt(0, 0, 0);
+    this.controls.target.set(0, 0, 0);
+    this.controls.update();
+  }
+
   resetCamera() {
     if (!this.camera || !this.controls) return;
     this.camera.position.set(4.8, 4.2, 5.6);
@@ -127,13 +160,25 @@ class RubiksCube3D {
   }
 
   onWindowResize() {
-    if (!this.container) return;
-    const width = this.container.clientWidth;
-    const height = this.container.clientHeight;
-    if (width === 0 || height === 0) return;
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(width, height);
+    if (this.container) {
+      const width = this.container.clientWidth;
+      const height = this.container.clientHeight;
+      if (width > 0 && height > 0) {
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+      }
+    }
+
+    if (this.backContainer && this.backRenderer && this.backCamera) {
+      const bw = this.backContainer.clientWidth || 128;
+      const bh = this.backContainer.clientHeight || 128;
+      if (bw > 0 && bh > 0) {
+        this.backCamera.aspect = bw / bh;
+        this.backCamera.updateProjectionMatrix();
+        this.backRenderer.setSize(bw, bh);
+      }
+    }
   }
 
   initAudio() {
@@ -530,6 +575,12 @@ class RubiksCube3D {
     requestAnimationFrame(() => this.animate());
     if (this.controls) this.controls.update();
     this.renderer.render(this.scene, this.camera);
+
+    if (this.backRenderer && this.backCamera) {
+      this.backCamera.position.copy(this.camera.position).negate();
+      this.backCamera.lookAt(0, 0, 0);
+      this.backRenderer.render(this.scene, this.backCamera);
+    }
   }
 }
 

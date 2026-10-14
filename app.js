@@ -43,7 +43,10 @@ const i18n = {
     valSuccess: "✅ 驗證成功！方塊狀態完美無誤，已同步至 3D 模型！",
     valErrCounts: "❌ 顏色數量錯誤：每種顏色必須恰好 9 格！目前統計：",
     langToggle: "🌐 English",
-    resetViewBtn: "🎯 視角歸位 (標準視角)",
+    resetViewBtn: "🎯 標準視角",
+    flipViewBtn: "🔄 翻轉視角",
+    backViewTitle: "🪞 背面/底面後照鏡",
+    backViewBadge: "後: 藍 • 底: 白 • 左: 橘",
     speedTitle: "轉速調節：",
     speedUltraSlow: "🐢 超慢速 (1000ms)",
     speedSlow: "🚶 慢速 (600ms)",
@@ -87,6 +90,9 @@ const i18n = {
     valErrCounts: "❌ Color distribution error: exactly 9 of each color required! Current: ",
     langToggle: "🌐 繁體中文",
     resetViewBtn: "🎯 Reset View",
+    flipViewBtn: "🔄 Flip View",
+    backViewTitle: "🪞 Rear Mirror View",
+    backViewBadge: "B: Blue • D: White • L: Orange",
     speedTitle: "Speed:",
     speedUltraSlow: "🐢 Very Slow (1000ms)",
     speedSlow: "🚶 Slow (600ms)",
@@ -219,11 +225,18 @@ class AppController {
       });
     });
 
-    // Reset View
+    // Reset View & Flip View
     const resetViewBtn = document.getElementById('btn-reset-view');
     if (resetViewBtn) {
       resetViewBtn.addEventListener('click', () => {
         this.cube3d.resetCamera();
+      });
+    }
+
+    const flipViewBtn = document.getElementById('btn-flip-view');
+    if (flipViewBtn) {
+      flipViewBtn.addEventListener('click', () => {
+        this.cube3d.flipCamera();
       });
     }
 
