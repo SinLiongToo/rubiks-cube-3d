@@ -2,6 +2,8 @@
 
 一個專為魔術方塊新手與進階玩家打造的全功能互動式 Web 應用程式。融合**教學 (Learn)**、**暢玩 (Play)**、**創作與求解 (Create & Solve)** 三大核心維度，並針對新手常見痛點進行深度優化！
 
+> 🌐 **線上體驗 (GitHub Pages)**：[https://sinliongtoo.github.io/rubiks-cube-3d/](https://sinliongtoo.github.io/rubiks-cube-3d/)
+
 ---
 
 ## 🚀 最新升級重點 (新手友善優化)
