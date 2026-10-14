@@ -102,8 +102,8 @@
               <span>🧭</span> <span data-i18n="holdingTitle">正確手持方位指引</span>
             </div>
             <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-slate-300">
-              <span class="compass-badge">⬆ 頂(U): <span class="w-2.5 h-2.5 rounded-full bg-white inline-block"></span> 白</span>
-              <span class="compass-badge">⬇ 底(D): <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 inline-block"></span> 黃</span>
+              <span class="compass-badge">⬆ 頂(U): <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 inline-block border border-black/20"></span> 黃</span>
+              <span class="compass-badge">⬇ 底(D): <span class="w-2.5 h-2.5 rounded-full bg-white inline-block border border-black/20"></span> 白</span>
               <span class="compass-badge">👁 前(F): <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> 綠</span>
               <span class="compass-badge">🔙 後(B): <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span> 藍</span>
               <span class="compass-badge">⬅ 左(L): <span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> 橘</span>
@@ -199,8 +199,15 @@
 
         <!-- 7-Step LBL Interactive Curriculum Card -->
         <div class="glass-panel p-5 flex flex-col gap-3.5 border-l-4 border-l-sky-500">
-          <div class="flex items-center justify-between">
-            <span class="text-xs uppercase tracking-wider font-bold text-sky-400">7-Step LBL Course</span>
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-1 border-b border-white/10">
+            <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-white/10 text-xs">
+              <button id="btn-mode-chain" class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all bg-sky-500 text-slate-950 shadow-sm" title="保留上個步驟的成果，一層一層闖關復原！">
+                🔗 接續闖關模式
+              </button>
+              <button id="btn-mode-isolated" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition-all" title="獨立示範該步驟公式，適合單獨練習肌肉記憶">
+                🎯 獨立單題模式
+              </button>
+            </div>
             <span id="tutorial-step-indicator" class="font-mono text-xs bg-sky-500/10 text-sky-400 px-2.5 py-0.5 rounded-full font-bold">1 / 7</span>
           </div>
 
@@ -208,6 +215,30 @@
           <h2 id="tutorial-card-title" class="text-base font-bold text-slate-100 flex items-center gap-2">
             步驟一：黃心白花與底面十字
           </h2>
+
+          <!-- Step Connectivity & Progression State Box -->
+          <div id="tutorial-card-chain-box" class="bg-emerald-950/40 border border-emerald-500/30 px-3 py-2 rounded-xl text-xs text-emerald-200 flex items-start gap-2 shadow-sm">
+            <span class="text-sm mt-0.5">🔗</span>
+            <div class="flex flex-col gap-0.5">
+              <span class="font-bold text-emerald-300">前後步驟連接狀態：</span>
+              <span id="tutorial-chain-desc" class="text-emerald-100">🌱【教學起點】方塊頂面為黃色中心，四周為 4 個白色邊塊（黃心白花）。轉動後完成底面白十字！</span>
+            </div>
+          </div>
+
+          <!-- Step Connectivity FAQ Box -->
+          <details class="bg-slate-900/60 p-2.5 rounded-xl border border-white/5 text-xs text-slate-300 group">
+            <summary class="font-bold text-sky-300 flex items-center justify-between cursor-pointer select-none">
+              <span class="flex items-center gap-1.5">
+                <span>💡</span> <span>步驟一與步驟二的狀態，是如何連接的？</span>
+              </span>
+              <span class="text-[10px] text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div class="mt-2 space-y-1.5 text-xs text-slate-300 border-t border-white/10 pt-2 leading-relaxed">
+              <p>• <strong class="text-amber-300">步驟一 ➔ 步驟二</strong>：步驟一完成「底面白色十字」，四個側面顏色都跟中心對齊。步驟二<strong class="text-emerald-300">完全保留白十字</strong>，只用右手公式把 4 個白色角塊塞入底層，完成整個第一層！</p>
+              <p>• <strong class="text-amber-300">步驟二 ➔ 步驟三</strong>：第一層做完後，步驟三<strong class="text-emerald-300">完全保留第一層</strong>，將中層 4 個邊塊裝進去，完成前兩層 (F2L)！</p>
+              <p>• <strong class="text-amber-300">步驟四～七</strong>：前兩層完全不動，依序在黃色頂面完成「黃十字 ➔ 全黃 ➔ 四角歸位 ➔ 三邊歸位」，整顆魔術方塊大功告成！</p>
+            </div>
+          </details>
 
           <!-- Goal -->
           <div class="bg-sky-950/40 border border-sky-500/20 px-3 py-2 rounded-xl text-xs text-sky-200">

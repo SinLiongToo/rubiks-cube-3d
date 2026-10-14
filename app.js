@@ -104,6 +104,7 @@ class AppController {
     this.currentThemeMode = 'dark';
     this.currentTab = 'learn'; // Default to Learn tab so user immediately sees the rich explanations!
     this.currentTutorialStep = 0;
+    this.tutorialMode = 'chain'; // 'chain' (接續闖關模式) or 'isolated' (獨立單題模式)
 
     // Step-by-step trainer state
     this.stepMovesList = [];
@@ -117,14 +118,14 @@ class AppController {
     this.solveTimes = [];
     this.moveCount = 0;
 
-    // Net state editor: 6 faces x 9 stickers
-    this.selectedPaletteColor = 'W';
+    // Net state editor: 6 faces x 9 stickers (U=Yellow, D=White)
+    this.selectedPaletteColor = 'Y';
     this.netColors = {
-      W: '#ffffff', Y: '#ffd500', O: '#ff5800', R: '#b71234', G: '#009b48', B: '#0046ad'
+      Y: '#ffd500', W: '#ffffff', O: '#ff5800', R: '#b71234', G: '#009b48', B: '#0046ad'
     };
     this.netState = {
-      U: Array(9).fill('W'), L: Array(9).fill('O'), F: Array(9).fill('G'),
-      R: Array(9).fill('R'), B: Array(9).fill('B'), D: Array(9).fill('Y')
+      U: Array(9).fill('Y'), L: Array(9).fill('O'), F: Array(9).fill('G'),
+      R: Array(9).fill('R'), B: Array(9).fill('B'), D: Array(9).fill('W')
     };
 
     this.init();
@@ -348,6 +349,17 @@ class AppController {
       });
     }
 
+    // Mode Toggle: Chain Progression vs Isolated Drill
+    const chainModeBtn = document.getElementById('btn-mode-chain');
+    if (chainModeBtn) {
+      chainModeBtn.addEventListener('click', () => this.setTutorialMode('chain'));
+    }
+
+    const isolatedModeBtn = document.getElementById('btn-mode-isolated');
+    if (isolatedModeBtn) {
+      isolatedModeBtn.addEventListener('click', () => this.setTutorialMode('isolated'));
+    }
+
     // Step Trainer Buttons (Guaranteed State Synchronization)
     const setupBtn = document.getElementById('btn-tutorial-setup');
     if (setupBtn) {
@@ -497,6 +509,23 @@ class AppController {
     }
   }
 
+  setTutorialMode(mode) {
+    this.tutorialMode = mode;
+    const chainBtn = document.getElementById('btn-mode-chain');
+    const isolatedBtn = document.getElementById('btn-mode-isolated');
+    if (chainBtn && isolatedBtn) {
+      if (mode === 'chain') {
+        chainBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition-all bg-sky-500 text-slate-950 shadow-sm';
+        isolatedBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition-all';
+      } else {
+        isolatedBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition-all bg-sky-500 text-slate-950 shadow-sm';
+        chainBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition-all';
+      }
+    }
+    const lesson = LBL_COURSE[this.currentTutorialStep];
+    if (lesson) this.setupCase(lesson);
+  }
+
   updateStepPrompt() {
     const promptEl = document.getElementById('step-current-prompt');
     if (!promptEl) return;
@@ -507,7 +536,31 @@ class AppController {
     }
 
     if (this.stepCurrentIndex >= this.stepMovesList.length) {
-      promptEl.innerHTML = `<span class="text-emerald-400 font-bold flex items-center gap-1.5">🎉 本步驟所有動作已演練完成！方塊已順利達成目標！</span>`;
+      if (this.currentTutorialStep < LBL_COURSE.length - 1) {
+        promptEl.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 w-full">
+            <span class="text-emerald-400 font-bold flex items-center gap-1 text-xs">
+              🎉 本步驟動作已演練完成！
+            </span>
+            <button id="btn-chain-advance" class="px-2.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black rounded-lg text-xs shadow-md transition-all flex items-center gap-1 cursor-pointer">
+              👉 接續成果，挑戰步驟 ${this.currentTutorialStep + 2}！➔
+            </button>
+          </div>
+        `;
+        const advBtn = document.getElementById('btn-chain-advance');
+        if (advBtn) {
+          advBtn.addEventListener('click', () => {
+            this.currentTutorialStep++;
+            this.renderTutorialCard();
+          });
+        }
+      } else {
+        promptEl.innerHTML = `
+          <div class="flex items-center gap-2 text-emerald-400 font-black text-xs">
+            🏆 恭喜！7 大步驟全部通關！魔術方塊已六面完全復原！
+          </div>
+        `;
+      }
       return;
     }
 
@@ -537,6 +590,11 @@ class AppController {
     const titleEl = document.getElementById('tutorial-card-title');
     if (titleEl) {
       titleEl.textContent = `${lesson.icon} ${this.currentLang === 'zh' ? lesson.titleZh : lesson.titleEn}`;
+    }
+
+    const chainDescEl = document.getElementById('tutorial-chain-desc');
+    if (chainDescEl) {
+      chainDescEl.textContent = lesson.chainInheritZh || '';
     }
 
     const targetEl = document.getElementById('tutorial-card-target');

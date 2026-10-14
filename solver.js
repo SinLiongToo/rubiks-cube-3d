@@ -7,8 +7,8 @@ class CubeLogic {
   constructor() {
     this.faces = ['U', 'D', 'L', 'R', 'F', 'B'];
     this.defaultColors = {
-      U: 'W', // White
-      D: 'Y', // Yellow
+      U: 'Y', // Yellow (頂面黃色)
+      D: 'W', // White (底面白色)
       L: 'O', // Orange
       R: 'R', // Red
       F: 'G', // Green
@@ -115,6 +115,7 @@ const LBL_COURSE = [
     titleEn: 'Step 1: Daisy to White Cross',
     targetZh: '在白色底面做出 4 條「側邊顏色與中心對齊」的白色十字！',
     holdingZh: '🧭 拿法：黃色中心朝上(U)、白色中心朝下(D)、綠色中心朝自己(F)',
+    chainInheritZh: '🌱【教學起點】方塊頂面為黃色中心，四周為 4 個白色邊塊（黃心白花）。轉動後完成底面白十字！',
     whyDaisyZh: '🤔 為什麼叫「黃心白花」？新手若直接在白色底面做十字，常會把邊塊側面的顏色搞錯（例如白綠邊塊放在了藍色中心旁）。所以最聰明的做法是：先將 4 個白色邊塊湊到頂部「黃色中心」四周，看起來就像一朵黃色花蕊、白色花瓣的「雛菊(Daisy)」。接著轉動頂層，讓花瓣側面顏色跟側面的中心塊同色連線，再轉 180°(兩下)送到底部，完美的白色十字就自然做好了！',
     formula: "F2 R2 B2 L2",
     setup: "F2 R2 B2 L2",
@@ -133,6 +134,7 @@ const LBL_COURSE = [
     titleEn: 'Step 2: First Layer Corners',
     targetZh: '把 4 個帶有白色的角塊放回底層，側面形成漂亮的「倒 T 字形」！',
     holdingZh: '🧭 拿法：白色底面朝下(D)、黃色朝上(U)。將要放進底部的目標角塊放在頂層「右上角」。',
+    chainInheritZh: '🔗【接續步驟一】底面白色十字完整保留！目標角塊位於右上角，做右手公式歸位，完成整個第一層！',
     whyDaisyZh: '🤔 什麼是「右手公式 (Sexy Move)」？即 R U R\' U\'。英文代號與中文動作完全「一對一對應」：\n• R ➔ 【上】：右手將右層「往上推」\n• U ➔ 【左】：右手食指將頂層「往左撥」\n• R\' ➔ 【下】：右手將右層「往下拉回復位」\n• U\' ➔ 【右】：左手食指將頂層「往右撥回復位」\n重複做 1~5 次，角塊就會精準歸位且白色朝下！',
     formula: "R U R' U'",
     setup: "U R U' R'",
@@ -151,6 +153,7 @@ const LBL_COURSE = [
     titleEn: 'Step 3: Second Layer Edges',
     targetZh: '將頂層不含黃色的邊塊，送進中層的左右位置，完成前兩層 (F2L)！',
     holdingZh: '🧭 拿法：白色朝下(D)、黃色朝上(U)。把要歸位的邊塊轉到正面對齊中心顏色。',
+    chainInheritZh: '🔗【接續步驟二】整個第一層（白面+側面倒T）完整保留！將頂層無黃邊塊送入中層，完成前兩層 (F2L)！',
     whyDaisyZh: '🤔 如何送進中層？邊塊如果要送進右邊：先「頂層往左撥」遠離目標 ➔ 做一次右手公式 ➔ 整顆方塊轉向右側 ➔ 做一次左手公式把它裝進去！',
     formula: "U R U' R' U' F' U F",
     setup: "F' U' F U R U R' U'",
@@ -173,6 +176,7 @@ const LBL_COURSE = [
     titleEn: 'Step 4: Top Yellow Cross',
     targetZh: '不管角塊顏色，先讓頂層 4 個黃色邊塊朝上，形成「黃色十字架」！',
     holdingZh: '🧭 拿法：黃色頂面朝上(U)。如果有橫線請「水平橫放」，如果有拐角請放在「9點鐘與12點鐘」。',
+    chainInheritZh: '🔗【接續步驟三】前兩層完全保留！在頂面黃色中心周圍做出黃色十字架！',
     whyDaisyZh: '🤔 一條萬能公式：順時針轉開前面 (F) ➔ 做一次右手公式【上、左、下、右】(R U R\' U\') ➔ 逆時針轉回前面 (F\')。頂面會按照【中心點 ➔ 拐角 ➔ 一字線 ➔ 十字】依序演變！',
     formula: "F R U R' U' F'",
     setup: "F U R U' R' F'",
@@ -193,6 +197,7 @@ const LBL_COURSE = [
     titleEn: 'Step 5: Yellow Face Orientation (Sune)',
     targetZh: '翻轉頂層角塊朝向，讓頂面 9 個格子全部變成黃色！',
     holdingZh: '🧭 拿法：黃色頂面朝上(U)。如果有魚的形狀（1個黃色角塊朝上），請將「魚頭朝向左下角」！',
+    chainInheritZh: '🔗【接續步驟四】前兩層與頂面黃色十字完全保留！使用小魚公式將頂面所有角塊翻出全黃！',
     whyDaisyZh: '🤔 為什麼叫「小魚」？頂面黃十字完成後，若正好只有 1 個角塊朝上，形狀就像一隻游動的金魚 🐟！只要把魚頭對準左下角，做一次小魚公式【上、左、下、左、上、左左、下】，頂面所有黃色貼紙就會全部翻轉朝上！',
     formula: "R U R' U R U2 R'",
     setup: "R U2 R' U' R U' R'",
@@ -214,6 +219,7 @@ const LBL_COURSE = [
     titleEn: 'Step 6: Permute Top Corners (Headlights)',
     targetZh: '將頂層 4 個角塊旋轉到正確位置，讓側面每個角塊顏色與中心對齊！',
     holdingZh: '🧭 拿法：黃色朝上(U)。觀察頂層四周，如果有兩個同色角塊（稱為「車燈/眼睛 👀」），將車燈「放在左側(L)或後方(B)」。',
+    chainInheritZh: '🔗【接續步驟五】前兩層與全黃頂面完全保留！做換角公式將四個角塊對齊側面顏色！',
     whyDaisyZh: '🤔 什麼是「車燈 (Headlights)」？例如頂層某一側面，左上角是紅色、右上角也是紅色（中間邊塊顏色先不管），這兩個同色角塊看起來就像汽車的兩盞大燈！做一次換角公式即可將所有角塊換到正確位置。',
     formula: "R U R' U' R' F R2 U' R' U' R U R' F'",
     setup: "F R U' R' U R U R2 F' R U R U' R'",
@@ -242,6 +248,7 @@ const LBL_COURSE = [
     titleEn: 'Step 7: Permute Top Edges (Solved!)',
     targetZh: '最後一步！將剩餘 3 個頂層邊塊三輪換到正確位置，見證魔方完全還原！',
     holdingZh: '🧭 拿法：黃色朝上(U)。檢查四周，通常有 1 面已經完全拼好，將那面「放在後方(B)」，面對未完成的三面。',
+    chainInheritZh: '🔗【接續步驟六】前兩層與四個角塊完整歸位！最後 3 個頂層邊塊三輪換，六面完全復原！',
     whyDaisyZh: '🤔 三輪換 (U-Perm) 會固定後方已完成的面，將左、前、右三個邊塊進行輪換，轉完瞬間整個六面全部復原！',
     formula: "R U' R U R U R U' R' U' R2",
     setup: "R2 U R U R' U' R' U' R' U R'",

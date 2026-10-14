@@ -18,11 +18,11 @@ class RubiksCube3D {
       theme: 'classic'
     }, options);
 
-    // Color definitions
+    // Color definitions (Standard Rubik's: U=Yellow, D=White, F=Green, B=Blue, R=Red, L=Orange)
     this.themes = {
       classic: {
-        U: 0xffffff, // White
-        D: 0xffd500, // Yellow
+        U: 0xffd500, // Yellow (黃頂)
+        D: 0xffffff, // White (白底)
         L: 0xff5800, // Orange
         R: 0xb71234, // Red
         F: 0x009b48, // Green
@@ -30,8 +30,8 @@ class RubiksCube3D {
         inner: 0x18181b // Matte black inner core
       },
       pastel: {
-        U: 0xfffaf0, // Ivory White
-        D: 0xfef08a, // Soft Yellow
+        U: 0xfef08a, // Soft Yellow
+        D: 0xfffaf0, // Ivory White
         L: 0xfdba74, // Peach Orange
         R: 0xf472b6, // Soft Rose
         F: 0x86efac, // Mint Green
@@ -39,8 +39,8 @@ class RubiksCube3D {
         inner: 0x334155
       },
       neon: {
-        U: 0xf8fafc, // Bright White
-        D: 0xfacc15, // Cyber Yellow
+        U: 0xfacc15, // Cyber Yellow
+        D: 0xf8fafc, // Bright White
         L: 0xf97316, // Blaze Orange
         R: 0xec4899, // Hot Magenta
         F: 0x10b981, // Electric Emerald
@@ -48,8 +48,8 @@ class RubiksCube3D {
         inner: 0x090d16
       },
       carbon: {
-        U: 0xe2e8f0, // Silver White
-        D: 0xeab308, // Gold Yellow
+        U: 0xeab308, // Gold Yellow
+        D: 0xe2e8f0, // Silver White
         L: 0xea580c, // Burnt Orange
         R: 0xbe123c, // Crimson
         F: 0x047857, // Forest Green
