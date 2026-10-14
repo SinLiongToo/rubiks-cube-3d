@@ -517,6 +517,24 @@ class AppController {
     const formulaEl = document.getElementById('tutorial-card-formula');
     if (formulaEl) formulaEl.textContent = lesson.formula;
 
+    // Render 1-to-1 Action Correspondence Grid
+    const mappingContainer = document.getElementById('tutorial-moves-mapping-table');
+    if (mappingContainer) {
+      mappingContainer.innerHTML = '';
+      if (lesson.movesGuide && lesson.movesGuide.length > 0) {
+        lesson.movesGuide.forEach(g => {
+          const card = document.createElement('div');
+          card.className = 'flex flex-col items-center justify-center bg-slate-950/70 p-2 rounded-xl border border-sky-500/25 text-center shadow-sm';
+          card.innerHTML = `
+            <div class="font-mono font-black text-sky-400 text-sm tracking-wide">${g.move}</div>
+            <div class="font-bold text-amber-300 text-xs my-0.5">${g.actionZh || ''}</div>
+            <div class="text-[10px] text-slate-300 leading-tight">${g.textZh}</div>
+          `;
+          mappingContainer.appendChild(card);
+        });
+      }
+    }
+
     const tipEl = document.getElementById('tutorial-card-tip');
     if (tipEl) tipEl.textContent = lesson.tipZh;
 

@@ -226,14 +226,25 @@
           </p>
 
           <!-- Core Formula & Mnemonic Box -->
-          <div class="bg-slate-900/90 p-3 rounded-xl border border-white/10 flex flex-col gap-1.5">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-semibold text-slate-400" data-i18n="formulaLabel">核心公式：</span>
-              <span class="text-xs text-emerald-400 font-mono font-bold" id="tutorial-card-formula">F2 R2 B2 L2</span>
+          <div class="bg-slate-900/90 p-3.5 rounded-xl border border-white/10 flex flex-col gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-300" data-i18n="formulaLabel">核心公式：</span>
+              <span class="text-sm text-emerald-400 font-mono font-black tracking-wider bg-slate-950 px-2.5 py-1 rounded-lg border border-white/10" id="tutorial-card-formula">F2 R2 B2 L2</span>
             </div>
-            <div class="text-[11px] text-slate-300 leading-snug">
-              <span class="text-sky-400 font-medium" data-i18n="mnemonicLabel">口訣：</span>
-              <span id="tutorial-card-tip">黃心白花 ➔ 對齊側面顏色 ➔ 轉兩次 180° 送到底部。</span>
+
+            <!-- 1-to-1 Action Correspondence Grid -->
+            <div class="flex flex-col gap-1 pt-1 border-t border-white/10">
+              <span class="text-[11px] text-sky-400 font-bold flex items-center gap-1">
+                🔗 代號與中文動作一對一對應：
+              </span>
+              <div id="tutorial-moves-mapping-table" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                <!-- Dynamically rendered 1-to-1 cards -->
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-300 leading-snug pt-1 border-t border-white/10">
+              <span class="text-amber-400 font-bold" data-i18n="mnemonicLabel">口訣：</span>
+              <span id="tutorial-card-tip" class="font-medium">黃心白花 ➔ 對齊側面顏色 ➔ 轉兩次 180° 送到底部。</span>
             </div>
           </div>
 
