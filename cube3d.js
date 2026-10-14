@@ -80,8 +80,12 @@ class RubiksCube3D {
     const width = this.container.clientWidth || 400;
     const height = this.container.clientHeight || 400;
 
-    this.camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    this.camera.position.set(4.8, 4.2, 5.6);
+    this.camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+    // Adjusted camera distance and target offset to prevent UI card overlap
+    this.defaultCameraPos = new THREE.Vector3(5.8, 4.8, 6.8);
+    this.defaultTarget = new THREE.Vector3(-0.35, -0.22, 0);
+
+    this.camera.position.copy(this.defaultCameraPos);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(width, height);
@@ -96,7 +100,9 @@ class RubiksCube3D {
       this.controls.dampingFactor = 0.05;
       this.controls.rotateSpeed = 0.8;
       this.controls.minDistance = 4;
-      this.controls.maxDistance = 14;
+      this.controls.maxDistance = 16;
+      this.controls.target.copy(this.defaultTarget);
+      this.controls.update();
     }
 
     // Lighting
@@ -123,13 +129,11 @@ class RubiksCube3D {
     this.backContainer = document.getElementById('canvas-back-container');
     if (!this.backContainer) return;
 
-    const width = this.backContainer.clientWidth || 128;
-    const height = this.backContainer.clientHeight || 128;
+    const width = this.backContainer.clientWidth || 112;
+    const height = this.backContainer.clientHeight || 112;
 
-    this.backCamera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    // Oppsite to standard front view (4.8, 4.2, 5.6) -> (-4.8, -4.2, -5.6)
-    // Allows viewing Back (Blue), Down (White), and Left (Orange)
-    this.backCamera.position.set(-4.8, -4.2, -5.6);
+    this.backCamera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+    this.backCamera.position.copy(this.defaultCameraPos).negate();
     this.backCamera.lookAt(0, 0, 0);
 
     this.backRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -146,16 +150,14 @@ class RubiksCube3D {
   flipCamera() {
     if (!this.camera || !this.controls) return;
     this.camera.position.negate();
-    this.camera.lookAt(0, 0, 0);
-    this.controls.target.set(0, 0, 0);
+    this.controls.target.set(-this.controls.target.x, -this.controls.target.y, -this.controls.target.z);
     this.controls.update();
   }
 
   resetCamera() {
     if (!this.camera || !this.controls) return;
-    this.camera.position.set(4.8, 4.2, 5.6);
-    this.camera.lookAt(0, 0, 0);
-    this.controls.target.set(0, 0, 0);
+    this.camera.position.copy(this.defaultCameraPos);
+    this.controls.target.copy(this.defaultTarget);
     this.controls.update();
   }
 

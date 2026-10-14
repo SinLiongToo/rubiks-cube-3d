@@ -240,6 +240,18 @@ class AppController {
       });
     }
 
+    const togglePipBtn = document.getElementById('btn-toggle-pip');
+    const pipCard = document.getElementById('pip-back-view-card');
+    const pipIcon = document.getElementById('pip-toggle-icon');
+    if (togglePipBtn && pipCard) {
+      togglePipBtn.addEventListener('click', () => {
+        const isHidden = pipCard.classList.toggle('hidden');
+        if (pipIcon) {
+          pipIcon.textContent = isHidden ? '🪞' : '−';
+        }
+      });
+    }
+
     // Speed Preset Buttons
     document.querySelectorAll('.speed-preset-btn').forEach(btn => {
       btn.addEventListener('click', () => {

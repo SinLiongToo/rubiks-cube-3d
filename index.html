@@ -96,44 +96,47 @@
       <div class="glass-panel relative w-full h-[460px] md:h-[540px] rounded-2xl overflow-hidden flex flex-col">
         
         <!-- Orientation Compass Overlay (Top Left) -->
-        <div class="absolute top-3 left-3 z-10 flex flex-col gap-1 pointer-events-none">
-          <div class="bg-slate-900/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-lg text-[11px] flex flex-col gap-1">
-            <div class="text-[10px] font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1">
+        <div class="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
+          <div class="bg-slate-900/85 backdrop-blur-md px-2 py-1.5 rounded-xl border border-white/10 shadow-lg text-[10px] flex flex-col gap-0.5">
+            <div class="text-[9px] font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1">
               <span data-i18n="holdingTitle">🧭 正確手持方位指引</span>
             </div>
-            <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-slate-300">
-              <span class="compass-badge">⬆ 頂(U): <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 inline-block border border-black/20"></span> 黃</span>
-              <span class="compass-badge">⬇ 底(D): <span class="w-2.5 h-2.5 rounded-full bg-white inline-block border border-black/20"></span> 白</span>
-              <span class="compass-badge">👁 前(F): <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> 綠</span>
-              <span class="compass-badge">🔙 後(B): <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span> 藍</span>
-              <span class="compass-badge">⬅ 左(L): <span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> 橘</span>
-              <span class="compass-badge">➡ 右(R): <span class="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block"></span> 紅</span>
+            <div class="grid grid-cols-2 gap-x-1.5 gap-y-0.5 text-slate-300">
+              <span class="compass-badge">⬆ 頂(U): <span class="w-2 h-2 rounded-full bg-yellow-400 inline-block border border-black/20"></span> 黃</span>
+              <span class="compass-badge">⬇ 底(D): <span class="w-2 h-2 rounded-full bg-white inline-block border border-black/20"></span> 白</span>
+              <span class="compass-badge">👁 前(F): <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> 綠</span>
+              <span class="compass-badge">🔙 後(B): <span class="w-2 h-2 rounded-full bg-blue-600 inline-block"></span> 藍</span>
+              <span class="compass-badge">⬅ 左(L): <span class="w-2 h-2 rounded-full bg-orange-500 inline-block"></span> 橘</span>
+              <span class="compass-badge">➡ 右(R): <span class="w-2 h-2 rounded-full bg-rose-600 inline-block"></span> 紅</span>
             </div>
           </div>
         </div>
 
         <!-- Top Right: Rear Mirror View + Camera Controls -->
-        <div class="absolute top-3 right-3 z-10 flex flex-col items-end gap-2">
+        <div class="absolute top-2.5 right-2.5 z-10 flex flex-col items-end gap-1.5">
           <!-- View Action Buttons -->
-          <div class="flex items-center gap-1.5">
-            <button id="btn-flip-view" class="px-2.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md text-xs font-bold text-sky-300 border border-white/10 shadow-lg transition-all flex items-center gap-1" data-i18n="flipViewBtn" title="切換正反主視角 (前後對調)">
-              🔄 翻轉視角
+          <div class="flex items-center gap-1">
+            <button id="btn-flip-view" class="px-2 py-1 rounded-lg bg-slate-900/85 hover:bg-slate-800 backdrop-blur-md text-[11px] font-bold text-sky-300 border border-white/10 shadow-md transition-all flex items-center gap-1" data-i18n="flipViewBtn" title="切換正反主視角 (前後對調)">
+              🔄 翻轉
             </button>
-            <button id="btn-reset-view" class="px-2.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md text-xs font-bold text-slate-200 border border-white/10 shadow-lg transition-all flex items-center gap-1" data-i18n="resetViewBtn" title="回到正面俯視標準角度">
-              🎯 標準視角
+            <button id="btn-reset-view" class="px-2 py-1 rounded-lg bg-slate-900/85 hover:bg-slate-800 backdrop-blur-md text-[11px] font-bold text-slate-200 border border-white/10 shadow-md transition-all flex items-center gap-1" data-i18n="resetViewBtn" title="回到正面俯視標準角度">
+              🎯 歸位
+            </button>
+            <button id="btn-toggle-pip" class="px-2 py-1 rounded-lg bg-slate-900/85 hover:bg-slate-800 backdrop-blur-md text-[11px] font-bold text-slate-300 border border-white/10 shadow-md transition-all flex items-center gap-1" title="收起 / 展開背面後照鏡">
+              <span id="pip-toggle-icon">−</span>
             </button>
           </div>
 
           <!-- Rear Mirror PiP Card (Back & Bottom View) -->
-          <div id="pip-back-view-card" class="bg-slate-900/85 backdrop-blur-md p-2 rounded-2xl border border-white/10 shadow-2xl flex flex-col items-center gap-1.5 transition-all hover:border-sky-500/40">
-            <div class="w-full flex items-center justify-between text-[11px] font-bold text-sky-400 px-1 gap-2">
-              <span class="flex items-center gap-1" data-i18n="backViewTitle">🪞 背面/底面後照鏡</span>
-              <span class="text-[10px] text-slate-400 font-normal">點擊切換</span>
+          <div id="pip-back-view-card" class="bg-slate-900/90 backdrop-blur-md p-1.5 rounded-xl border border-white/10 shadow-xl flex flex-col items-center gap-1 transition-all hover:border-sky-500/40">
+            <div class="w-full flex items-center justify-between text-[10px] font-bold text-sky-400 px-1 gap-1">
+              <span class="flex items-center gap-1" data-i18n="backViewTitle">🪞 背面後照鏡</span>
+              <span class="text-[9px] text-slate-400 font-normal">點擊切換</span>
             </div>
-            <div id="canvas-back-container" class="w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden bg-slate-950/60 border border-white/10 relative cursor-pointer shadow-inner" title="點擊將背面視角切換為主視角">
+            <div id="canvas-back-container" class="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden bg-slate-950/70 border border-white/10 relative cursor-pointer shadow-inner" title="點擊將背面視角切換為主視角">
               <!-- 2nd WebGL Canvas mounted here -->
             </div>
-            <div class="text-[10px] text-slate-300 flex items-center gap-1.5 px-0.5" data-i18n="backViewBadge">
+            <div class="text-[9px] text-slate-300 flex items-center gap-1 px-0.5" data-i18n="backViewBadge">
               <span class="text-blue-400 font-semibold">後: 藍</span> • <span class="text-white font-semibold">底: 白</span> • <span class="text-orange-400 font-semibold">左: 橘</span>
             </div>
           </div>
