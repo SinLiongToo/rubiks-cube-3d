@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>魔術方塊大師 Rubik's Cube 3D - 教、玩、做一體化平台</title>
+  <!-- Tailwind CSS -->
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <!-- Three.js & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- Header -->
+  <header class="glass-panel mx-4 mt-3 p-3 flex flex-wrap items-center justify-between gap-3 z-30">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20 text-xl font-black text-white">
+        🎲
+      </div>
+      <div>
+        <h1 class="text-lg md:text-xl font-bold tracking-tight" data-i18n="appTitle">
+          魔術方塊大師 Rubik's Cube 3D
+        </h1>
+        <p class="text-xs text-slate-400" data-i18n="appSubtitle">
+          互動學習 • 自由暢玩 • 客製解法
+        </p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs: 教、玩、做 (Default on 教) -->
+    <div class="flex items-center bg-slate-800/60 dark:bg-slate-800/60 light:bg-slate-200/80 p-1 rounded-xl border border-white/5">
+      <button class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition-all active" data-tab="learn" data-i18n="tabLearn">
+        📖 教 • 教學學院
+      </button>
+      <button class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition-all text-slate-300" data-tab="play" data-i18n="tabPlay">
+        🎮 玩 • 自由競速
+      </button>
+      <button class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition-all text-slate-300" data-tab="make" data-i18n="tabMake">
+        🛠️ 做 • 自訂與求解
+      </button>
+    </div>
+
+    <!-- Utilities: Sound, Theme, Language -->
+    <div class="flex items-center gap-2">
+      <button id="btn-sound-toggle" class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-medium border border-white/10 transition-colors flex items-center gap-1">
+        🔊 音效：開
+      </button>
+      <button id="btn-theme-toggle" class="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-sm border border-white/10 transition-colors" title="切換深淺色">
+        ☀️ / 🌙
+      </button>
+      <button id="btn-lang-toggle" class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold border border-white/10 transition-colors">
+        🌐 English
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workstation Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+    <!-- Left: 3D Viewport Column (7 Cols) -->
+    <section class="lg:col-span-7 flex flex-col gap-3">
+
+      <!-- Speed Controller Bar (Easily accessible right above the 3D cube) -->
+      <div class="glass-panel p-3 flex flex-wrap items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-sky-400 flex items-center gap-1" data-i18n="speedTitle">
+            ⏱️ 轉速調節：
+          </span>
+          <div class="flex items-center gap-1">
+            <button class="speed-preset-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/5" data-speed="1000" data-i18n="speedUltraSlow">
+              🐢 超慢 (1000ms)
+            </button>
+            <button class="speed-preset-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/5 active-speed" data-speed="600" data-i18n="speedSlow">
+              🚶 慢速 (600ms)
+            </button>
+            <button class="speed-preset-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/5" data-speed="350" data-i18n="speedNormal">
+              ⚡ 正常 (350ms)
+            </button>
+            <button class="speed-preset-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/5" data-speed="150" data-i18n="speedFast">
+              🚀 快速 (150ms)
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-1 max-w-[200px]">
+          <input id="speed-slider-global" type="range" min="100" max="1500" step="50" value="600" class="w-full accent-sky-400 cursor-pointer">
+          <span id="speed-value-badge" class="font-mono text-xs font-bold text-sky-400 min-w-[50px] text-right">600 ms</span>
+        </div>
+      </div>
+
+      <!-- 3D Canvas Container -->
+      <div class="glass-panel relative w-full h-[460px] md:h-[540px] rounded-2xl overflow-hidden flex flex-col">
+        
+        <!-- Orientation Compass Overlay (Top Left) -->
+        <div class="absolute top-3 left-3 z-10 flex flex-col gap-1 pointer-events-none">
+          <div class="bg-slate-900/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-lg text-[11px] flex flex-col gap-1">
+            <div class="text-[10px] font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1">
+              <span>🧭</span> <span data-i18n="holdingTitle">正確手持方位指引</span>
+            </div>
+            <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-slate-300">
+              <span class="compass-badge">⬆ 頂(U): <span class="w-2.5 h-2.5 rounded-full bg-white inline-block"></span> 白</span>
+              <span class="compass-badge">⬇ 底(D): <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 inline-block"></span> 黃</span>
+              <span class="compass-badge">👁 前(F): <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> 綠</span>
+              <span class="compass-badge">🔙 後(B): <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span> 藍</span>
+              <span class="compass-badge">⬅ 左(L): <span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> 橘</span>
+              <span class="compass-badge">➡ 右(R): <span class="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block"></span> 紅</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset View Button (Top Right) -->
+        <div class="absolute top-3 right-3 z-10">
+          <button id="btn-reset-view" class="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md text-xs font-bold text-slate-200 border border-white/10 shadow-lg transition-all flex items-center gap-1.5" data-i18n="resetViewBtn">
+            🎯 視角歸位 (標準視角)
+          </button>
+        </div>
+
+        <!-- 3D Canvas Mount Point -->
+        <div id="canvas3d-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+        <!-- In-Canvas Overlay Hints -->
+        <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none text-xs text-slate-400 bg-slate-900/60 backdrop-blur-md px-3 py-2 rounded-xl border border-white/5">
+          <span>💡 滑鼠左鍵拖曳貼紙可直接轉動面；拖曳空白處旋轉視角</span>
+          <span class="hidden md:inline font-mono">支援鍵盤：U D L R F B / Shift</span>
+        </div>
+      </div>
+
+      <!-- Quick Move Controls Panel -->
+      <div class="glass-panel p-4 flex flex-col gap-2">
+        <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+          <span data-i18n="controlsTitle">轉動控制面板 (可直接在方塊上拖曳旋轉)</span>
+          <span class="font-mono text-sky-400">Layer Rotations</span>
+        </div>
+        <div class="grid grid-cols-6 sm:grid-cols-9 gap-1.5">
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="U">U</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="U'">U'</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="U2">U2</button>
+
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="D">D</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="D'">D'</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="D2">D2</button>
+
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="L">L</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="L'">L'</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="L2">L2</button>
+
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="R">R</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="R'">R'</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="R2">R2</button>
+
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="F">F</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="F'">F'</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="F2">F2</button>
+
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="B">B</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="B'">B'</button>
+          <button class="move-btn bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 text-sm border border-white/5" data-move="B2">B2</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Dynamic Workspace Panels (5 Cols) -->
+    <section class="lg:col-span-5 flex flex-col gap-4">
+
+      <!-- TAB 2: 教 (Learn & Academy - DEFAULT ACTIVE) -->
+      <div id="tab-learn" class="tab-content flex flex-col gap-4">
+
+        <!-- Beginner Anatomy & Jargon Glossary Box -->
+        <details class="glass-panel p-4 cursor-pointer group" open>
+          <summary class="text-sm font-bold text-sky-400 flex items-center justify-between select-none">
+            <span class="flex items-center gap-1.5" data-i18n="anatomyTitle">💡 新手必看：魔術方塊結構與名詞大白話</span>
+            <span class="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-3 flex flex-col gap-2.5 text-xs text-slate-300 leading-relaxed border-t border-white/10 pt-3">
+            <div class="bg-slate-900/60 p-2.5 rounded-xl border border-white/5">
+              <span class="font-bold text-amber-300">1. 中心塊 (Center)：</span>
+                每面只有 1 個（共 6 個）。**固定不動！** 白色永遠對黃色、綠色永遠對藍色。它決定了該面最終的顏色。
+            </div>
+            <div class="bg-slate-900/60 p-2.5 rounded-xl border border-white/5">
+              <span class="font-bold text-sky-300">2. 邊塊 (Edge)：</span>
+                十字位置共 12 個，**每個邊塊有 2 種顏色**（如白綠、白藍）。絕不可能跑到角塊位置。
+            </div>
+            <div class="bg-slate-900/60 p-2.5 rounded-xl border border-white/5">
+              <span class="font-bold text-emerald-300">3. 角塊 (Corner)：</span>
+                角落共 8 個，**每個角塊有 3 種顏色**（如白紅綠）。
+            </div>
+            <div class="bg-slate-900/60 p-2.5 rounded-xl border border-white/5">
+              <span class="font-bold text-rose-300" data-i18n="whyDaisyTitle">🌼 為什麼叫「黃心白花」？</span>
+              <p class="mt-1 text-slate-300">
+                新手如果直接在白色底面做十字，常會將邊塊側面顏色接錯。所以最聰明的做法是：**把頂層黃色中心當成花蕊，先將 4 個白色邊塊湊到黃色中心周圍**，看起來就像一朵有 4 片白花瓣的小雛菊 (Daisy)！接著看每片花瓣側面的顏色，旋轉頂層讓側面顏色與中心對齊，再轉 180°(兩次)翻到底部，底層白色十字就自然做好了，而且顏色絕對不會錯！
+              </p>
+            </div>
+          </div>
+        </details>
+
+        <!-- 7-Step LBL Interactive Curriculum Card -->
+        <div class="glass-panel p-5 flex flex-col gap-3.5 border-l-4 border-l-sky-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase tracking-wider font-bold text-sky-400">7-Step LBL Course</span>
+            <span id="tutorial-step-indicator" class="font-mono text-xs bg-sky-500/10 text-sky-400 px-2.5 py-0.5 rounded-full font-bold">1 / 7</span>
+          </div>
+
+          <!-- Step Title -->
+          <h2 id="tutorial-card-title" class="text-base font-bold text-slate-100 flex items-center gap-2">
+            步驟一：黃心白花與底面十字
+          </h2>
+
+          <!-- Goal -->
+          <div class="bg-sky-950/40 border border-sky-500/20 px-3 py-2 rounded-xl text-xs text-sky-200">
+            <span class="font-bold text-sky-400">🎯 此步驟目標：</span>
+            <span id="tutorial-card-target">做出 4 條側邊顏色與中心對齊的白色十字！</span>
+          </div>
+
+          <!-- Holding Position (Alignment & Orientation) -->
+          <div class="bg-slate-900/80 border border-white/10 px-3 py-2 rounded-xl text-xs text-slate-300 font-medium">
+            <span id="tutorial-card-holding">🧭 拿法：黃色中心朝上(U)、白色中心朝下(D)、綠色中心朝自己(F)</span>
+          </div>
+
+          <!-- Plain Language Explanation -->
+          <p id="tutorial-card-why" class="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-2.5 rounded-xl border border-white/5">
+            先將 4 個白色邊塊湊到頂部黃色中心四周形成小花...
+          </p>
+
+          <!-- Core Formula & Mnemonic Box -->
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-white/10 flex flex-col gap-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-slate-400" data-i18n="formulaLabel">核心公式：</span>
+              <span class="text-xs text-emerald-400 font-mono font-bold" id="tutorial-card-formula">F2 R2 B2 L2</span>
+            </div>
+            <div class="text-[11px] text-slate-300 leading-snug">
+              <span class="text-sky-400 font-medium" data-i18n="mnemonicLabel">口訣：</span>
+              <span id="tutorial-card-tip">黃心白花 ➔ 對齊側面顏色 ➔ 轉兩次 180° 送到底部。</span>
+            </div>
+          </div>
+
+          <!-- Interactive Step-by-Step Trainer -->
+          <div class="bg-slate-950/60 p-3 rounded-xl border border-sky-500/30 flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-sky-400">👣 單步演練器 (點擊單步學習)：</span>
+              <button id="btn-step-restart" class="text-[11px] text-slate-400 hover:text-slate-200 underline" data-i18n="btnRestartStep">
+                ↺ 重新演練
+              </button>
+            </div>
+
+            <!-- Chips sequence -->
+            <div id="step-chips-container" class="flex flex-wrap items-center gap-1.5 min-h-[30px] p-1 bg-slate-900/60 rounded-lg">
+              <!-- Dynamically rendered -->
+            </div>
+
+            <!-- Current Move Explanatory Prompt -->
+            <div id="step-current-prompt" class="text-xs text-slate-200 bg-slate-900/80 p-2 rounded-lg border border-white/5 min-h-[32px] flex items-center">
+              點擊「示範此步驟局面」或「單步下一步」開始演練！
+            </div>
+
+            <!-- Step Trainer Buttons Grid -->
+            <div class="grid grid-cols-3 gap-1.5 pt-1">
+              <button id="btn-step-prev" class="py-2 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-white/10 transition-all text-center" data-i18n="btnStepPrev">
+                ◀ 單步退回
+              </button>
+              <button id="btn-step-next" class="py-2 px-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-900 text-xs font-bold shadow-md shadow-sky-500/20 transition-all text-center" data-i18n="btnStepNext">
+                單步下一步 ▶
+              </button>
+              <button id="btn-tutorial-play" class="py-2 px-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition-all text-center" data-i18n="btnPlayFormula">
+                ▶ 自動連續播放
+              </button>
+            </div>
+          </div>
+
+          <!-- Step Setup Case Button -->
+          <button id="btn-tutorial-setup" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold border border-white/10 text-slate-200 transition-all flex items-center justify-center gap-1.5" data-i18n="btnSetupCase">
+            🎯 示範此步驟局面 (Setup)
+          </button>
+
+          <!-- Prev / Next Lesson Navigation -->
+          <div class="flex items-center justify-between pt-2 border-t border-white/10">
+            <button id="btn-tutorial-prev" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-medium text-slate-300 transition-colors" data-i18n="btnPrevStep">
+              ← 上個教學步驟
+            </button>
+            <button id="btn-tutorial-next" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold text-white transition-colors" data-i18n="btnNextStep">
+              下個教學步驟 →
+            </button>
+          </div>
+        </div>
+
+        <!-- Notations Quick Ref -->
+        <div class="glass-panel p-4 flex flex-col gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-sky-400" data-i18n="notationTitle">基礎轉動符號速查 (點擊即時 3D 演示)</h3>
+            <p class="text-xs text-slate-400 mt-0.5" data-i18n="notationDesc">單字母為順時針旋轉 90°，加上「'」為逆時針 90°，加上「2」為旋轉 180°。</p>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="move-btn p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-left border border-white/5 flex flex-col" data-move="U">
+              <span class="font-bold text-sky-400 text-sm">U (Up)</span>
+              <span class="text-[10px] text-slate-400">頂層順時針 90°</span>
+            </button>
+            <button class="move-btn p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-left border border-white/5 flex flex-col" data-move="D">
+              <span class="font-bold text-amber-400 text-sm">D (Down)</span>
+              <span class="text-[10px] text-slate-400">底層順時針 90°</span>
+            </button>
+            <button class="move-btn p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-left border border-white/5 flex flex-col" data-move="L">
+              <span class="font-bold text-orange-400 text-sm">L (Left)</span>
+              <span class="text-[10px] text-slate-400">左層順時針 90°</span>
+            </button>
+            <button class="move-btn p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-left border border-white/5 flex flex-col" data-move="R">
+              <span class="font-bold text-rose-400 text-sm">R (Right)</span>
+              <span class="text-[10px] text-slate-400">右層順時針 90°</span>
+            </button>
+            <button class="move-btn p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-left border border-white/5 flex flex-col" data-move="F">
+              <span class="font-bold text-emerald-400 text-sm">F (Front)</span>
+              <span class="text-[10px] text-slate-400">前層順時針 90°</span>
+            </button>
+            <button class="move-btn p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-left border border-white/5 flex flex-col" data-move="B">
+              <span class="font-bold text-blue-400 text-sm">B (Back)</span>
+              <span class="text-[10px] text-slate-400">後層順時針 90°</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 1: 玩 (Play & Speedcube) -->
+      <div id="tab-play" class="tab-content hidden flex flex-col gap-4">
+        
+        <!-- Scramble Bar -->
+        <div class="glass-panel p-4 flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-sky-400">WCA Scramble</span>
+            <button id="btn-scramble" class="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-900 font-bold text-xs shadow-md shadow-sky-500/20 transition-all" data-i18n="scrambleBtn">
+              隨機打亂 (Scramble)
+            </button>
+          </div>
+          <div id="scramble-text" class="font-mono text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-lg select-all break-words border border-white/5 min-h-[38px] flex items-center">
+            點擊「隨機打亂」生成官方公式...
+          </div>
+        </div>
+
+        <!-- Speedcubing Timer -->
+        <div class="glass-panel p-5 flex flex-col items-center justify-center gap-3 select-none text-center relative overflow-hidden">
+          <div class="text-xs text-slate-400 font-medium" id="timer-hint" data-i18n="timerHint">
+            按住「空白鍵」或「點擊長按」準備，鬆開開始計時；任意鍵或點擊停止
+          </div>
+          
+          <div id="timer-display" class="text-5xl md:text-6xl font-mono font-black tracking-wider text-slate-100 cursor-pointer py-2">
+            0.00
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="w-full grid grid-cols-4 gap-2 pt-2 border-t border-white/10 text-center">
+            <div class="flex flex-col">
+              <span class="text-[10px] text-slate-400 font-semibold" data-i18n="statPB">個人最佳</span>
+              <span id="stat-pb" class="font-mono font-bold text-emerald-400 text-sm">--</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] text-slate-400 font-semibold" data-i18n="statAo5">平均 (Ao5)</span>
+              <span id="stat-ao5" class="font-mono font-bold text-sky-400 text-sm">--</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] text-slate-400 font-semibold" data-i18n="statMoves">步數</span>
+              <span id="stat-moves" class="font-mono font-bold text-amber-400 text-sm">0</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] text-slate-400 font-semibold" data-i18n="statTPS">轉速 (TPS)</span>
+              <span id="stat-tps" class="font-mono font-bold text-indigo-400 text-sm">0.0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Tools -->
+        <div class="glass-panel p-4 grid grid-cols-3 gap-2">
+          <button id="btn-undo" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold border border-white/5 transition-all text-slate-200" data-i18n="undoBtn">
+            復原一步
+          </button>
+          <button id="btn-reset" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold border border-white/5 transition-all text-slate-200" data-i18n="resetBtn">
+            一鍵復原
+          </button>
+          <button id="btn-solve-reverse" class="py-2.5 px-3 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all" data-i18n="solveReverseBtn">
+            倒帶自動還原
+          </button>
+        </div>
+
+      </div>
+
+      <!-- TAB 3: 做 (Create & Studio) -->
+      <div id="tab-make" class="tab-content hidden flex flex-col gap-4">
+        
+        <!-- 2D Unfolded Net State Editor -->
+        <div class="glass-panel p-4 flex flex-col gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-sky-400" data-i18n="netTitle">2D 展開圖實體魔方填色器</h3>
+            <p class="text-xs text-slate-400 mt-0.5" data-i18n="netDesc">先點選下方色盤，再點擊展開圖中的貼紙，即可將手邊真實魔術方塊的顏色輸入系統！</p>
+          </div>
+
+          <!-- Color Palette Picker -->
+          <div class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-xl border border-white/5">
+            <span class="text-xs font-semibold text-slate-300" data-i18n="paletteTitle">選擇貼紙顏色：</span>
+            <div id="color-palette" class="flex items-center gap-2"></div>
+          </div>
+
+          <!-- 2D Net Cube Grid -->
+          <div class="flex justify-center p-2 bg-slate-900/40 rounded-xl overflow-x-auto">
+            <div id="net-faces-grid" class="grid grid-cols-4 grid-rows-3 gap-2 p-1">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+
+          <div id="net-validation-msg" class="text-xs min-h-[18px]"></div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-validate-net" class="py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-900 text-xs font-bold shadow-md shadow-sky-500/20 transition-all" data-i18n="btnValidateSync">
+              驗證並載入至 3D 方塊
+            </button>
+            <button id="btn-reset-net" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold border border-white/5 transition-all text-slate-200" data-i18n="btnResetNet">
+              重設為完成狀態
+            </button>
+          </div>
+        </div>
+
+        <!-- Appearance & Physics Studio -->
+        <div class="glass-panel p-4 flex flex-col gap-3">
+          <h3 class="text-sm font-bold text-sky-400" data-i18n="customizerTitle">外觀材質工坊</h3>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-slate-300">配色主題：</label>
+            <select id="select-theme" class="bg-slate-800 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+              <option value="classic" data-i18n="themeClassic">經典標準 (Classic WCA)</option>
+              <option value="pastel" data-i18n="themePastel">馬卡龍 (Pastel Dream)</option>
+              <option value="neon" data-i18n="themeNeon">賽博霓虹 (Cyber Neon)</option>
+              <option value="carbon" data-i18n="themeCarbon">碳纖維黑曜 (Stealth)</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <div class="flex justify-between text-xs text-slate-300">
+              <span data-i18n="gapLabel">方塊間隙 (爆炸展示)：</span>
+            </div>
+            <input id="slider-gap" type="range" min="0.00" max="0.25" step="0.01" value="0.04" class="w-full accent-sky-400 cursor-pointer">
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto py-3 text-center text-xs text-slate-400 border-t border-white/5">
+    Rubik's Cube 3D Master &copy; 2026 • 支援全平台瀏覽器 • 3D WebGL Three.js Engine
+  </footer>
+
+  <!-- App scripts -->
+  <script src="cube3d.js"></script>
+  <script src="solver.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

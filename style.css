@@ -1,0 +1,189 @@
+/* Modern Glassmorphic Rubik's Cube Styling */
+:root {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: rgba(30, 41, 59, 0.75);
+  --bg-card-border: rgba(255, 255, 255, 0.1);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --accent-primary: #38bdf8;
+  --accent-glow: rgba(56, 189, 248, 0.3);
+  --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+  --btn-bg: rgba(51, 65, 85, 0.6);
+  --btn-hover: rgba(71, 85, 105, 0.8);
+  --btn-active: #38bdf8;
+  --slider-track: #334155;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #e2e8f0;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-border: rgba(0, 0, 0, 0.08);
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --accent-primary: #0284c7;
+  --accent-glow: rgba(2, 132, 199, 0.25);
+  --accent-gradient: linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
+  --btn-bg: rgba(241, 245, 249, 0.8);
+  --btn-hover: rgba(226, 232, 240, 1);
+  --btn-active: #0284c7;
+  --slider-track: #cbd5e1;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Glass effect container */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--bg-card-border);
+  box-shadow: 0 10px 30px var(--shadow-color);
+  border-radius: 16px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+/* Tab Active Indicator */
+.tab-btn.active {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+/* Move button keys */
+.move-btn {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.move-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+.move-btn:active {
+  transform: translateY(1px);
+}
+
+/* Speed Preset Buttons */
+.speed-preset-btn {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+.speed-preset-btn.active-speed {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+
+/* Timer Pulse & Ready states */
+.timer-ready {
+  color: #22c55e !important;
+  text-shadow: 0 0 25px rgba(34, 197, 94, 0.6);
+}
+.timer-holding {
+  color: #eab308 !important;
+  text-shadow: 0 0 25px rgba(234, 179, 8, 0.6);
+}
+.timer-running {
+  color: var(--text-primary);
+}
+
+/* 2D Net Cube Grid */
+.net-face {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  border-radius: 8px;
+  width: 84px;
+  height: 84px;
+}
+.net-sticker {
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.net-sticker:hover {
+  transform: scale(1.1);
+  z-index: 2;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+.net-sticker.selected-center {
+  outline: 2px dashed #ffffff;
+  outline-offset: -2px;
+}
+
+/* Color Palette Picker */
+.palette-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: 2px solid transparent;
+}
+.palette-swatch:hover {
+  transform: scale(1.15);
+}
+.palette-swatch.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  transform: scale(1.1);
+}
+
+/* 3D Canvas Container */
+#canvas3d-container {
+  touch-action: none;
+}
+
+/* Floating Compass Pill */
+.compass-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
