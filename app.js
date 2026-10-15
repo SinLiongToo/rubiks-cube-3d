@@ -110,6 +110,7 @@ class AppController {
     this.currentThemeMode = 'dark';
     this.currentTab = 'learn'; // Default to Learn tab so user immediately sees the rich explanations!
     this.currentTutorialStep = 0;
+    this.cubeSize = 3; // 3 = standard 3x3, 2 = 2x2 Pocket Cube
     this.tutorialMode = 'chain'; // 'chain' (接續闖關模式) or 'isolated' (獨立單題模式)
 
     // Step-by-step trainer state
@@ -159,6 +160,43 @@ class AppController {
     this.setupEventListeners();
     this.applyTranslations();
     this.updateSpeedUI(600);
+  }
+
+  /** Returns the tutorial course for the current cube size */
+  getCourse() {
+    return this.cubeSize === 2 ? LBL_COURSE_2X2 : LBL_COURSE;
+  }
+
+  /** Switch between 2x2 Pocket Cube and 3x3 */
+  setCubeSize(n) {
+    if (n !== 2 && n !== 3) return;
+    this.cubeSize = n;
+    this.cube3d.setCubeSize(n);
+    this.logic.reset();
+    this.moveCount = 0;
+    this.updateStatsUI();
+
+    document.querySelectorAll('.cube-size-btn').forEach(btn => {
+      const active = parseInt(btn.getAttribute('data-size')) === n;
+      btn.className = active
+        ? 'cube-size-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-400 text-slate-950 shadow-sm transition-all'
+        : 'cube-size-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition-all';
+    });
+
+    // Hide slice-move (M/E/S) buttons on 2x2 — a 2x2 has no middle layer
+    document.querySelectorAll('.move-btn').forEach(btn => {
+      const m = (btn.getAttribute('data-move') || '')[0];
+      if ('MES'.includes(m) && m) btn.classList.toggle('hidden', n === 2);
+    });
+
+    const scrEl = document.getElementById('scramble-text');
+    if (scrEl) scrEl.textContent = '';
+
+    const faq = document.getElementById('faq-3x3-chain');
+    if (faq) faq.classList.toggle('hidden', n === 2);
+
+    this.currentTutorialStep = 0;
+    this.renderTutorialCard();
   }
 
   setSpeed(ms) {
@@ -223,6 +261,11 @@ class AppController {
       btn.addEventListener('click', () => {
         this.switchTab(btn.getAttribute('data-tab'));
       });
+    });
+
+    // Cube Size Toggle (2x2 / 3x3)
+    document.querySelectorAll('.cube-size-btn').forEach(btn => {
+      btn.addEventListener('click', () => this.setCubeSize(parseInt(btn.getAttribute('data-size'))));
     });
 
     // Reset View & Flip View
@@ -367,7 +410,7 @@ class AppController {
     const nextBtn = document.getElementById('btn-tutorial-next');
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
-        if (this.currentTutorialStep < LBL_COURSE.length - 1) {
+        if (this.currentTutorialStep < this.getCourse().length - 1) {
           this.currentTutorialStep++;
           this.renderTutorialCard();
         }
@@ -389,7 +432,7 @@ class AppController {
     const setupBtn = document.getElementById('btn-tutorial-setup');
     if (setupBtn) {
       setupBtn.addEventListener('click', () => {
-        const lesson = LBL_COURSE[this.currentTutorialStep];
+        const lesson = this.getCourse()[this.currentTutorialStep];
         if (lesson) {
           this.setupCase(lesson);
         }
@@ -399,7 +442,7 @@ class AppController {
     const playAllBtn = document.getElementById('btn-tutorial-play');
     if (playAllBtn) {
       playAllBtn.addEventListener('click', () => {
-        const lesson = LBL_COURSE[this.currentTutorialStep];
+        const lesson = this.getCourse()[this.currentTutorialStep];
         if (lesson) {
           if (this.stepCurrentIndex >= this.stepMovesList.length) {
             this.setupCase(lesson);
@@ -429,7 +472,7 @@ class AppController {
     const restartStepBtn = document.getElementById('btn-step-restart');
     if (restartStepBtn) {
       restartStepBtn.addEventListener('click', () => {
-        const lesson = LBL_COURSE[this.currentTutorialStep];
+        const lesson = this.getCourse()[this.currentTutorialStep];
         if (lesson) {
           this.setupCase(lesson);
         }
@@ -490,7 +533,7 @@ class AppController {
   }
 
   jumpToStep(targetIndex) {
-    const lesson = LBL_COURSE[this.currentTutorialStep];
+    const lesson = this.getCourse()[this.currentTutorialStep];
     if (!lesson) return;
     this.cube3d.stopQueue();
     this.cube3d.resetCube();
@@ -547,7 +590,7 @@ class AppController {
         chainBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition-all';
       }
     }
-    const lesson = LBL_COURSE[this.currentTutorialStep];
+    const lesson = this.getCourse()[this.currentTutorialStep];
     if (lesson) this.setupCase(lesson);
   }
 
@@ -561,7 +604,7 @@ class AppController {
     }
 
     if (this.stepCurrentIndex >= this.stepMovesList.length) {
-      if (this.currentTutorialStep < LBL_COURSE.length - 1) {
+      if (this.currentTutorialStep < this.getCourse().length - 1) {
         promptEl.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-2 w-full">
             <span class="text-emerald-400 font-bold flex items-center gap-1 text-xs">
@@ -582,7 +625,7 @@ class AppController {
       } else {
         promptEl.innerHTML = `
           <div class="flex items-center gap-2 text-emerald-400 font-black text-xs">
-            🏆 恭喜！7 大步驟全部通關！魔術方塊已六面完全復原！
+            🏆 恭喜！${this.cubeSize}×${this.cubeSize} 全部 ${this.getCourse().length} 個步驟通關！魔術方塊已六面完全復原！
           </div>
         `;
       }
@@ -590,7 +633,7 @@ class AppController {
     }
 
     const currentMove = this.stepMovesList[this.stepCurrentIndex];
-    const lesson = LBL_COURSE[this.currentTutorialStep];
+    const lesson = this.getCourse()[this.currentTutorialStep];
     const guideItem = lesson.movesGuide ? lesson.movesGuide.find(g => g.move === currentMove) : null;
     const action = guideItem ? guideItem.actionZh : '';
     const desc = guideItem ? guideItem.textZh : `動作：${currentMove}`;
@@ -606,11 +649,11 @@ class AppController {
   }
 
   renderTutorialCard() {
-    const lesson = LBL_COURSE[this.currentTutorialStep];
+    const lesson = this.getCourse()[this.currentTutorialStep];
     if (!lesson) return;
 
     const stepNumEl = document.getElementById('tutorial-step-indicator');
-    if (stepNumEl) stepNumEl.textContent = `${this.currentTutorialStep + 1} / ${LBL_COURSE.length}`;
+    if (stepNumEl) stepNumEl.textContent = `${this.currentTutorialStep + 1} / ${this.getCourse().length}`;
 
     const titleEl = document.getElementById('tutorial-card-title');
     if (titleEl) {
@@ -674,7 +717,7 @@ class AppController {
     if (prevBtn) prevBtn.disabled = this.currentTutorialStep === 0;
 
     const nextBtn = document.getElementById('btn-tutorial-next');
-    if (nextBtn) nextBtn.disabled = this.currentTutorialStep === LBL_COURSE.length - 1;
+    if (nextBtn) nextBtn.disabled = this.currentTutorialStep === this.getCourse().length - 1;
   }
 
   highlightTableRow(index) {
@@ -826,7 +869,9 @@ class AppController {
     this.cube3d.resetCube();
     this.logic.reset();
     this.moveCount = 0;
-    const scrambleString = this.logic.generateScramble(20);
+    const scrambleString = this.cubeSize === 2
+      ? this.logic.generateScramble(11, ['R', 'U', 'F'])
+      : this.logic.generateScramble(20);
     const scrEl = document.getElementById('scramble-text');
     if (scrEl) scrEl.textContent = scrambleString;
 

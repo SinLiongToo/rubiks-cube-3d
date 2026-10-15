@@ -66,6 +66,12 @@
 
       <!-- Speed Controller Bar (Easily accessible right above the 3D cube) -->
       <div class="glass-panel p-3 flex flex-wrap items-center justify-between gap-2.5">
+        <!-- Cube Size Toggle -->
+        <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-white/10" title="切換魔術方塊階數">
+          <span class="text-xs font-bold text-amber-300 px-1">🧊 階數：</span>
+          <button class="cube-size-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition-all" data-size="2">2×2</button>
+          <button class="cube-size-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-400 text-slate-950 shadow-sm transition-all" data-size="3">3×3</button>
+        </div>
         <div class="flex items-center gap-2">
           <span class="text-xs font-bold text-sky-400 flex items-center gap-1" data-i18n="speedTitle">
             ⏱️ 轉速調節：
@@ -249,7 +255,7 @@
           </div>
 
           <!-- Step Connectivity FAQ Box -->
-          <details class="bg-slate-900/60 p-2.5 rounded-xl border border-white/5 text-xs text-slate-300 group">
+          <details id="faq-3x3-chain" class="bg-slate-900/60 p-2.5 rounded-xl border border-white/5 text-xs text-slate-300 group">
             <summary class="font-bold text-sky-300 flex items-center justify-between cursor-pointer select-none">
               <span class="flex items-center gap-1.5">
                 <span>💡</span> <span>步驟一與步驟二的狀態，是如何連接的？</span>

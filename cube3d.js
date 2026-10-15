@@ -225,19 +225,28 @@ class RubiksCube3D {
     const size = 1.0 - this.options.gap;
     const geometry = new THREE.BoxGeometry(size, size, size);
 
+    // 2x2: coordinates ±0.5 ; 3x3: coordinates -1, 0, 1
+    const n = this.cubeSize || 3;
+    const half = (n - 1) / 2;
+    const coords = [];
+    for (let i = 0; i < n; i++) coords.push(i - half);
+    const isMax = v => Math.abs(v - half) < 0.01;
+    const isMin = v => Math.abs(v + half) < 0.01;
+
     // Order: +X(R), -X(L), +Y(U), -Y(D), +Z(F), -Z(B)
-    for (let x = -1; x <= 1; x++) {
-      for (let y = -1; y <= 1; y++) {
-        for (let z = -1; z <= 1; z++) {
-          if (x === 0 && y === 0 && z === 0) continue; // Skip core
+    for (const x of coords) {
+      for (const y of coords) {
+        for (const z of coords) {
+          // Skip fully hidden interior pieces
+          if (!isMax(x) && !isMin(x) && !isMax(y) && !isMin(y) && !isMax(z) && !isMin(z)) continue;
 
           const materials = [
-            this.createStickerMaterial(x === 1 ? this.currentTheme.R : this.currentTheme.inner, 'R', x === 1),
-            this.createStickerMaterial(x === -1 ? this.currentTheme.L : this.currentTheme.inner, 'L', x === -1),
-            this.createStickerMaterial(y === 1 ? this.currentTheme.U : this.currentTheme.inner, 'U', y === 1),
-            this.createStickerMaterial(y === -1 ? this.currentTheme.D : this.currentTheme.inner, 'D', y === -1),
-            this.createStickerMaterial(z === 1 ? this.currentTheme.F : this.currentTheme.inner, 'F', z === 1),
-            this.createStickerMaterial(z === -1 ? this.currentTheme.B : this.currentTheme.inner, 'B', z === -1)
+            this.createStickerMaterial(isMax(x) ? this.currentTheme.R : this.currentTheme.inner, 'R', isMax(x)),
+            this.createStickerMaterial(isMin(x) ? this.currentTheme.L : this.currentTheme.inner, 'L', isMin(x)),
+            this.createStickerMaterial(isMax(y) ? this.currentTheme.U : this.currentTheme.inner, 'U', isMax(y)),
+            this.createStickerMaterial(isMin(y) ? this.currentTheme.D : this.currentTheme.inner, 'D', isMin(y)),
+            this.createStickerMaterial(isMax(z) ? this.currentTheme.F : this.currentTheme.inner, 'F', isMax(z)),
+            this.createStickerMaterial(isMin(z) ? this.currentTheme.B : this.currentTheme.inner, 'B', isMin(z))
           ];
 
           const mesh = new THREE.Mesh(geometry, materials);
@@ -254,6 +263,20 @@ class RubiksCube3D {
         }
       }
     }
+  }
+
+  /** Switch between 2x2 (Pocket Cube) and 3x3 */
+  setCubeSize(n) {
+    if (n !== 2 && n !== 3) return;
+    this.cubeSize = n;
+    this.stopQueue();
+    this.isRotating = false;
+    this.createCube();
+  }
+
+  /** Snap a coordinate to the nearest half unit (works for both 2x2 and 3x3) */
+  snap(v) {
+    return Math.round(v * 2) / 2;
   }
 
   createStickerMaterial(colorHex, faceName, isOuter) {
@@ -329,6 +352,8 @@ class RubiksCube3D {
     let isInverse = move.includes("'");
     let isDouble = move.includes("2");
 
+    // Outer-layer threshold: 3x3 pieces at ±1, 2x2 pieces at ±0.5
+    const T = (this.cubeSize === 2) ? 0.1 : 0.5;
     let axis = 'y';
     let filter = () => true;
     let angle = -Math.PI / 2;
@@ -336,45 +361,48 @@ class RubiksCube3D {
     switch (base) {
       case 'U':
         axis = 'y';
-        filter = c => c.position.y > 0.5;
+        filter = c => c.position.y > T;
         angle = -Math.PI / 2;
         break;
       case 'D':
         axis = 'y';
-        filter = c => c.position.y < -0.5;
+        filter = c => c.position.y < -T;
         angle = Math.PI / 2;
         break;
       case 'R':
         axis = 'x';
-        filter = c => c.position.x > 0.5;
+        filter = c => c.position.x > T;
         angle = -Math.PI / 2;
         break;
       case 'L':
         axis = 'x';
-        filter = c => c.position.x < -0.5;
+        filter = c => c.position.x < -T;
         angle = Math.PI / 2;
         break;
       case 'F':
         axis = 'z';
-        filter = c => c.position.z > 0.5;
+        filter = c => c.position.z > T;
         angle = -Math.PI / 2;
         break;
       case 'B':
         axis = 'z';
-        filter = c => c.position.z < -0.5;
+        filter = c => c.position.z < -T;
         angle = Math.PI / 2;
         break;
       case 'M': // between L and R
+        if (this.cubeSize === 2) return null;
         axis = 'x';
         filter = c => Math.abs(c.position.x) < 0.5;
         angle = Math.PI / 2;
         break;
       case 'E': // between U and D
+        if (this.cubeSize === 2) return null;
         axis = 'y';
         filter = c => Math.abs(c.position.y) < 0.5;
         angle = Math.PI / 2;
         break;
       case 'S': // between F and B
+        if (this.cubeSize === 2) return null;
         axis = 'z';
         filter = c => Math.abs(c.position.z) < 0.5;
         angle = -Math.PI / 2;
@@ -427,9 +455,9 @@ class RubiksCube3D {
 
         activeCubies.forEach(cubie => {
           this.scene.attach(cubie);
-          cubie.position.x = Math.round(cubie.position.x);
-          cubie.position.y = Math.round(cubie.position.y);
-          cubie.position.z = Math.round(cubie.position.z);
+          cubie.position.x = this.snap(cubie.position.x);
+          cubie.position.y = this.snap(cubie.position.y);
+          cubie.position.z = this.snap(cubie.position.z);
           cubie.updateMatrix();
         });
 
@@ -467,9 +495,9 @@ class RubiksCube3D {
 
     activeCubies.forEach(cubie => {
       this.scene.attach(cubie);
-      cubie.position.x = Math.round(cubie.position.x);
-      cubie.position.y = Math.round(cubie.position.y);
-      cubie.position.z = Math.round(cubie.position.z);
+      cubie.position.x = this.snap(cubie.position.x);
+      cubie.position.y = this.snap(cubie.position.y);
+      cubie.position.z = this.snap(cubie.position.z);
       cubie.updateMatrix();
     });
     this.pivot.rotation.set(0, 0, 0);
@@ -539,35 +567,36 @@ class RubiksCube3D {
   resolveDragMove(cubie, normal, dx, dy) {
     const worldNormal = normal.clone().applyQuaternion(cubie.quaternion).round();
     const pos = cubie.position;
+    const T = (this.cubeSize === 2) ? 0.1 : 0.5;
 
     if (Math.abs(worldNormal.y) > 0.5) {
       if (Math.abs(dx) > Math.abs(dy)) {
-        if (pos.z > 0.5) this.executeMove(dx > 0 ? "F'" : "F");
-        else if (pos.z < -0.5) this.executeMove(dx > 0 ? "B" : "B'");
+        if (pos.z > T) this.executeMove(dx > 0 ? "F'" : "F");
+        else if (pos.z < -T) this.executeMove(dx > 0 ? "B" : "B'");
         else this.executeMove(dx > 0 ? "S'" : "S");
       } else {
-        if (pos.x > 0.5) this.executeMove(dy > 0 ? "R" : "R'");
-        else if (pos.x < -0.5) this.executeMove(dy > 0 ? "L'" : "L");
+        if (pos.x > T) this.executeMove(dy > 0 ? "R" : "R'");
+        else if (pos.x < -T) this.executeMove(dy > 0 ? "L'" : "L");
         else this.executeMove(dy > 0 ? "M'" : "M");
       }
     } else if (Math.abs(worldNormal.z) > 0.5) {
       if (Math.abs(dx) > Math.abs(dy)) {
-        if (pos.y > 0.5) this.executeMove(dx > 0 ? "U" : "U'");
-        else if (pos.y < -0.5) this.executeMove(dx > 0 ? "D'" : "D");
+        if (pos.y > T) this.executeMove(dx > 0 ? "U" : "U'");
+        else if (pos.y < -T) this.executeMove(dx > 0 ? "D'" : "D");
         else this.executeMove(dx > 0 ? "E'" : "E");
       } else {
-        if (pos.x > 0.5) this.executeMove(dy > 0 ? "R'" : "R");
-        else if (pos.x < -0.5) this.executeMove(dy > 0 ? "L" : "L'");
+        if (pos.x > T) this.executeMove(dy > 0 ? "R'" : "R");
+        else if (pos.x < -T) this.executeMove(dy > 0 ? "L" : "L'");
         else this.executeMove(dy > 0 ? "M" : "M'");
       }
     } else if (Math.abs(worldNormal.x) > 0.5) {
       if (Math.abs(dx) > Math.abs(dy)) {
-        if (pos.y > 0.5) this.executeMove(dx > 0 ? "U" : "U'");
-        else if (pos.y < -0.5) this.executeMove(dx > 0 ? "D'" : "D");
+        if (pos.y > T) this.executeMove(dx > 0 ? "U" : "U'");
+        else if (pos.y < -T) this.executeMove(dx > 0 ? "D'" : "D");
         else this.executeMove(dx > 0 ? "E'" : "E");
       } else {
-        if (pos.z > 0.5) this.executeMove(dy > 0 ? "F" : "F'");
-        else if (pos.z < -0.5) this.executeMove(dy > 0 ? "B'" : "B");
+        if (pos.z > T) this.executeMove(dy > 0 ? "F" : "F'");
+        else if (pos.z < -T) this.executeMove(dy > 0 ? "B'" : "B");
         else this.executeMove(dy > 0 ? "S" : "S'");
       }
     }

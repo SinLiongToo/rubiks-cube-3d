@@ -25,8 +25,7 @@ class CubeLogic {
     this.moveHistory = [];
   }
 
-  generateScramble(length = 20) {
-    const faces = ['U', 'D', 'L', 'R', 'F', 'B'];
+  generateScramble(length = 20, faces = ['U', 'D', 'L', 'R', 'F', 'B']) {
     const modifiers = ['', "'", '2'];
     const opposite = { U: 'D', D: 'U', L: 'R', R: 'L', F: 'B', B: 'F' };
 
@@ -269,6 +268,81 @@ const LBL_COURSE = [
   }
 ];
 
+// 2x2 Pocket Cube Beginner Course (3 steps — 2x2 = a 3x3 with only corners!)
+const LBL_COURSE_2X2 = [
+  {
+    id: 'p1',
+    icon: '⬜',
+    titleZh: '步驟一：白色第一層 (2×2 First Layer)',
+    titleEn: 'Step 1: First Layer (White)',
+    targetZh: '把 4 個白色角塊放到底層，底面全白，且側面兩兩同色！',
+    holdingZh: '🧭 拿法：白色朝下(D)、黃色朝上(U)。把要放入的白色角塊轉到頂層「右前上角」，正下方就是它的目標位置。',
+    chainInheritZh: '🌱【教學起點】2×2 沒有中心塊也沒有邊塊，只有 8 個角塊！第一步直接做好整個白色底層。',
+    whyDaisyZh: '🤔 2×2 為什麼更簡單？2×2 就是「只剩角塊的 3×3」，所以不需要黃心白花、也不需要中層。\n• 3×3 步驟二的右手公式 R U R\' U\'【上、左、下、右】在這裡直接使用！\n• 重複做 1~5 次，角塊就會白色朝下歸位。\n⚠️ 注意：2×2 沒有中心塊當參考，先任選一個白色角塊放好，其餘角塊以它的側面顏色為準。',
+    formula: "R U R' U'",
+    setup: "U R U' R'",
+    movesGuide: [
+      { move: "R", actionZh: "【上】", textZh: "右手向上推右層 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "右手食指撥頂層向左 90°", whyZh: "U = Up 順時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右手向下拉回右層 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U'", actionZh: "【右】", textZh: "左手食指撥頂層向右 90°", whyZh: "U' = Up 逆時針" }
+    ],
+    tipZh: '角塊放右前上 ➔ 右手公式【上左下右】重複 ➔ 白色朝下即歸位！'
+  },
+  {
+    id: 'p2',
+    icon: '🐟',
+    titleZh: '步驟二：頂面全黃 (小魚公式 Sune)',
+    titleEn: 'Step 2: Yellow Face (Sune)',
+    targetZh: '翻轉頂層 4 個角塊，讓頂面 4 格全部變成黃色！',
+    holdingZh: '🧭 拿法：黃色朝上(U)。若頂面只有 1 個黃色朝上（小魚），把它放在「左前上角」。',
+    chainInheritZh: '🔗【接續步驟一】白色第一層完整保留！只翻轉頂層角塊，讓頂面變全黃。',
+    whyDaisyZh: '🤔 與 3×3 步驟五完全相同的「小魚公式」！\n口訣【上、左、下、左、上、左左、下】。\n若頂面沒有出現小魚形狀，先做一次公式，就會變出小魚，再做一次即可。',
+    formula: "R U R' U R U2 R'",
+    setup: "R U2 R' U' R U' R'",
+    movesGuide: [
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉回 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U2", actionZh: "【左左】", textZh: "頂層連續向左撥兩次 (180°)", whyZh: "U2 = Up 180°" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉回 90°", whyZh: "R' = Right 逆時針" }
+    ],
+    tipZh: '小魚頭放左前 ➔ 上、左、下、左、上、左左、下！'
+  },
+  {
+    id: 'p3',
+    icon: '👀',
+    titleZh: '步驟三：頂層角塊歸位 (車燈公式 → 完成!)',
+    titleEn: 'Step 3: Permute Corners (Solved!)',
+    targetZh: '交換頂層角塊位置，讓四個側面全部同色，2×2 完全復原！',
+    holdingZh: '🧭 拿法：黃色朝上(U)。找出側面兩個同色的「車燈 👀」，把車燈放在「左側(L)」。沒有車燈就先做一次公式。',
+    chainInheritZh: '🔗【接續步驟二】底層與全黃頂面保留！最後換角，六面全部復原！',
+    whyDaisyZh: '🤔 與 3×3 步驟六相同的換角公式 (T-Perm)。在 2×2 上做完這一步就直接六面復原，最快的新手 2×2 只要 3 個步驟！',
+    formula: "R U R' U' R' F R2 U' R' U' R U R' F'",
+    setup: "F R U' R' U R U R2 F' R U R U' R'",
+    movesGuide: [
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°", whyZh: "R' = Right 逆時針" },
+      { move: "F", actionZh: "【轉開】", textZh: "前層順時針開面 90°", whyZh: "F = Front 順時針" },
+      { move: "R2", actionZh: "【雙推】", textZh: "右層轉 180°", whyZh: "R2 = Right 180°" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°", whyZh: "R' = Right 逆時針" },
+      { move: "U'", actionZh: "【右】", textZh: "頂層向右撥 90°", whyZh: "U' = Up 逆時針" },
+      { move: "R", actionZh: "【上】", textZh: "右層向上推 90°", whyZh: "R = Right 順時針" },
+      { move: "U", actionZh: "【左】", textZh: "頂層向左撥 90°", whyZh: "U = Up 順時針" },
+      { move: "R'", actionZh: "【下】", textZh: "右層向下拉 90°", whyZh: "R' = Right 逆時針" },
+      { move: "F'", actionZh: "【轉回】", textZh: "前層逆時針還原 90°", whyZh: "F' = Front 逆時針" }
+    ],
+    tipZh: '車燈放左邊 ➔ T-Perm 換角 ➔ 2×2 大功告成！'
+  }
+];
+
 window.CubeLogic = CubeLogic;
 window.CUBE_ANATOMY = CUBE_ANATOMY;
 window.LBL_COURSE = LBL_COURSE;
+window.LBL_COURSE_2X2 = LBL_COURSE_2X2;
